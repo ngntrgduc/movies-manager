@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from utils.data import load_data
+from utils.data import load_data, write_data
 from utils.date import get_today, get_year
 
 st.set_page_config(page_title = "Add movies", page_icon=":heavy_plus_sign:", layout="wide")
@@ -29,7 +29,7 @@ def add_movie_to_db(record: dict):
     """Append a new movie record to the database."""
     df = load_data()
     df = pd.concat([df, pd.DataFrame([record])], ignore_index=True)
-    df.to_csv('test.csv', index=False)
+    write_data(df)
 
 def add_movie():
     name = st.session_state["name"].strip()

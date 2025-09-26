@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
-
 from ast import literal_eval
 
-from utils.data import load_data, load_column_config
+from utils.data import load_data, load_column_config, write_data
 
 st.set_page_config(page_title = "Edit movies", page_icon=":pencil2:", layout="wide")
 
@@ -30,5 +29,5 @@ if st.button(
     When editing data, double-click to update the database."
 ):
     saved_df = prepare_for_save(edited_df.copy())
-    saved_df.to_csv("test.csv", index=False)
+    write_data(saved_df)
     st.toast("Updated database.", icon='✅')

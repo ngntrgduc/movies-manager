@@ -5,6 +5,9 @@ import pandas as pd
 def load_data() -> pd.DataFrame:
     return pd.read_csv('test.csv')
 
+def write_data(df: pd.DataFrame) -> None:
+    df.to_csv('test.csv', index=False)
+
 def load_column_config() -> dict:
     """Load column config for Streamlit dataframe and data editor"""
     return {
