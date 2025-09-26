@@ -88,4 +88,4 @@ def add_movie():
     st.toast(f"Added **{name}**.", icon='✅')
     reset_form()
 
-st.button('Add', on_click=add_movie)
+st.button('Add', type="primary", on_click=add_movie)

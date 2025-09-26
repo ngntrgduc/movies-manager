@@ -25,7 +25,7 @@ edited_df = st.data_editor(
 )
 
 if st.button(
-    "Update", 
+    "Update", type="primary",
     help="Streamlit reruns on every widget interaction. \
     When editing data, double-click to update the database."
 ):
