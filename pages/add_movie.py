@@ -65,8 +65,8 @@ status_bar.segmented_control(
 )
 watched_year_bar.text_input("Watched date", key='date')
 rating_bar.number_input(
-    'Rating', min_value=0.0, max_value=10.0, step=0.5, 
-    value=None, format='%.1f', key='rating'
+    'Rating', min_value=1, max_value=10, value=None, 
+    placeholder='1-10', key='rating'
 )
 
 right_container.text_area('Note', height='stretch', key='note')
