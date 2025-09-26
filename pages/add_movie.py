@@ -7,20 +7,23 @@ from utils.date import get_today, get_year
 st.set_page_config(page_title = "Add movies", page_icon=":heavy_plus_sign:", layout="wide")
 
 # Use session state instead of form to auto-add watch_date when status changes
-default_settings = {
-    "name": "",
-    "year": None,
-    "status": "waiting",
-    "date": "",
-    "genres": "",
-    "type": "movie",
-    "country": None,
-    "rating": None,
-    "note": "",
-}
 def reset_form():
+    default_settings = {
+        "name": "",
+        "year": None,
+        "status": "waiting",
+        "type": "movie",
+        "country": None,
+        "genres": "",
+        "rating": None,
+        "watched_date": "",
+        "note": "",
+    }
     for key, val in default_settings.items():
         st.session_state[key] = val
+
+def update_watched_date():
+    st.session_state['watched_date'] = "" if st.session_state['status'] == "waiting" else get_today()
 
 def add_movie_to_db(record: dict):
     """Append a new movie record to the database."""
@@ -28,8 +31,29 @@ def add_movie_to_db(record: dict):
     df = pd.concat([df, pd.DataFrame([record])], ignore_index=True)
     df.to_csv('test.csv', index=False)
 
-def update_date():
-    st.session_state['date'] = "" if st.session_state['status'] == "waiting" else get_today()
+def add_movie():
+    name = st.session_state["name"].strip()
+    if not name:
+        st.error("Movie name is missing.")
+        return
+    
+    record = {
+        "name": name,
+        "year": int(st.session_state["year"]) if st.session_state["year"] else None,
+        "status": st.session_state["status"],
+        "type": st.session_state["type"],
+        "country": st.session_state["country"].strip() if st.session_state["country"] else None,
+        "genres": ",".join(
+            genre for genre in (g.strip() for g in st.session_state["genres"].split(",")) if genre
+        ),
+        "rating": st.session_state["rating"],
+        "watched_date": st.session_state["watched_date"],
+        "note": st.session_state["note"],
+    }
+    add_movie_to_db(record)
+    st.toast(f"Added **{name}**.", icon='✅')
+    reset_form()
+    # TODO clear cache of load_data()
 
 
 left_container, right_container = st.columns([0.5, 0.5], gap="medium")
@@ -50,6 +74,7 @@ country_bar.selectbox(
 
 genres_bar, add_button = left_container.columns([2, 1], vertical_alignment='bottom')
 genres_bar.text_input('Genres (separated by comma)', key='genres')
+add_button.button('Add', type="primary", width="stretch", on_click=add_movie)
 
 # Right container
 if "status" not in st.session_state:
@@ -60,38 +85,12 @@ status_bar, watched_year_bar, rating_bar = right_container.columns(
 )
 status_bar.segmented_control(
     'Status', ['waiting', 'completed' ,'dropped'], width='stretch',
-    # default='waiting',  # since using session state for setting value, this is unecessary
-    key='status', on_change=update_date
+    key='status', on_change=update_watched_date
 )
-watched_year_bar.text_input("Watched date", key='date')
+watched_year_bar.text_input("Watched date", placeholder='YYYY-MM-DD', key='watched_date')
 rating_bar.number_input(
-    'Rating', min_value=1, max_value=10, value=None, 
+    'Rating', min_value=1, max_value=10, value=None, step=1,
     placeholder='1-10', key='rating'
 )
 
 right_container.text_area('Note', height='stretch', key='note')
-
-def add_movie():
-    name = st.session_state["name"].strip()
-    if not name:
-        st.error("Movie name is missing.")
-        return
-    
-    record = {
-        "name": name,
-        "year": int(st.session_state["year"]) if st.session_state["year"] else None,
-        "status": st.session_state["status"],
-        "type": st.session_state["type"],
-        "country": st.session_state["country"].strip(),
-        "genres": ",".join(
-            [g.strip() for g in st.session_state["genres"].split(",") if g.strip()]
-        ),
-        "rating": st.session_state["rating"] if st.session_state["rating"] else None,
-        "watched_date": st.session_state["date"],
-        "note": st.session_state["note"],
-    }
-    add_movie_to_db(record)
-    st.toast(f"Added **{name}**.", icon='✅')
-    reset_form()
-
-add_button.button('Add', type="primary", width="stretch", on_click=add_movie)
