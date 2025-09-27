@@ -1,13 +1,40 @@
 import streamlit as st
 import pandas as pd
 
+from .date import get_year
+
 # @st.cache_data
-def load_data() -> pd.DataFrame:
-    return pd.read_csv('test.csv')
+def load_data(return_options=False) -> pd.DataFrame:
+    df = pd.read_csv('test.csv')
+    if return_options:
+        return df, {
+            'year': sorted(df['year'].dropna().astype(int).unique().tolist(), reverse=True),
+            'type': sorted(df['type'].unique().tolist()),
+            'country': sorted(df['country'].dropna().unique().tolist()),
+            'genres': sorted(
+                df['genres']
+                .dropna()
+                .apply(lambda x: [g.strip() for g in x.split(',')])
+                .explode()  # flatten lists into rows
+                .unique()
+                .tolist()
+            ),
+            'watched_year': sorted((
+                df['watched_date']
+                .dropna()
+                .apply(get_year)
+                .unique()
+                .tolist()
+            ), reverse=True),
+        }
+
+    return df
+
 
 def write_data(df: pd.DataFrame) -> None:
     df.to_csv('test.csv', index=False)
 
+# @st.cache_data
 def load_column_config() -> dict:
     """Load column config for Streamlit dataframe and data editor"""
     return {
