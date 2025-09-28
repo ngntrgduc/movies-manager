@@ -29,8 +29,9 @@ def update_watched_date() -> None:
 def add_movie_to_db(record: dict) -> None:
     """Append a new movie record to the database."""
     df = load_data()
-    df = pd.concat([df, pd.DataFrame([record])], ignore_index=True)
-    write_data(df)
+    new_row = pd.DataFrame([record]).astype(df.dtypes.to_dict())
+    new_df = pd.concat([df, new_row], ignore_index=True)
+    write_data(new_df)
 
 def add_movie() -> None:
     name = st.session_state['name'].strip()
