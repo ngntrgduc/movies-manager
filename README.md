@@ -21,7 +21,6 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - Visualization: Power BI
 
 ## Features
-- Data stored in CSV file
 - Full CRUD support (Create, Read, Update, Delete)
 - Track essential metadata: `name`, `year`, `status`, `type`, `country`, `genres`, `rating`, `watched_date`, `note`
 - Interactive dashboard with Power BI (Streamlit charts are limited and less interactive compared to Power BI)
@@ -52,5 +51,12 @@ uv sync
 ```
 streamlit run app.py
 ```
+
+## TODO
+- [ ] Switch to SQLite
+    - [ ] cache_resource for database connection
+    - [ ] Allow multiline note
+- [ ] Add input validation for Add and Edit page
+- [ ] Movies recommendation using ML + Model Compression
 
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.
