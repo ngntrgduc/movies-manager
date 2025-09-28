@@ -33,4 +33,5 @@ if st.button(
 ):
     saved_df = prepare_for_save(edited_df.copy())
     write_data(saved_df)
+    load_data.clear()  # Clear cache
     st.toast('Updated database.', icon='✅')

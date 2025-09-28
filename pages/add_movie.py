@@ -56,7 +56,7 @@ def add_movie() -> None:
     add_movie_to_db(record)
     st.toast(f'Added **{name}**.', icon='✅')
     reset_form()
-    # TODO clear cache of load_data()
+    load_data.clear()  # Clear cache
 
 
 left_container, right_container = st.columns([0.5, 0.5], gap='medium')
