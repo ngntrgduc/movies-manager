@@ -37,7 +37,7 @@ def add_movie_to_db(record: dict) -> None:
 def add_movie() -> None:
     name = st.session_state['name'].strip()
     if not name:
-        st.error('Movie name is missing.')
+        st.toast('**Movie name is missing.**', icon='❌')
         return
     
     record = {
