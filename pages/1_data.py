@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
 
-from utils.data import load_data, load_column_config
+from utils.data import load_data, load_column_config, get_options
 
 st.set_page_config(page_title = 'Movies Manager', page_icon=':movie_camera:', layout='wide')
 
-df, options = load_data(return_options=True)
-column_config = load_column_config()
+df = load_data()
+options = get_options(df)
 
 # First bar
 seach_bar, year_bar, watched_year_bar, status_bar = st.columns(
@@ -57,6 +57,6 @@ if selected_country:
     mask &= df['country'] == selected_country
 
 filtered_df = df[mask]
-st.dataframe(filtered_df, column_config=column_config, hide_index=True)
+st.dataframe(filtered_df, column_config=load_column_config(), hide_index=True)
 st.write(f'Total: **{filtered_df.shape[0]}**, \
          Memory usage: **{filtered_df.memory_usage().sum() / 1024:.2f} KB**')

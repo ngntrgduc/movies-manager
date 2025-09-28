@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
 
-from utils.data import load_data, write_data
+from utils.data import load_data, write_data, get_options
 from utils.date import get_today, get_year
 
 st.set_page_config(page_title = 'Add movies', page_icon=':heavy_plus_sign:', layout='wide')
 
-df, options = load_data(return_options=True)
+df = load_data()
+options = get_options(df)
 
 # Use session state to clear user input instead of st.form, 
 # so that watch_date is auto-added when the status changes.

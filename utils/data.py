@@ -4,10 +4,12 @@ import pandas as pd
 from .date import get_year
 
 @st.cache_data
-def load_data(return_options=False) -> pd.DataFrame:
-    df = pd.read_csv('test.csv')
-    if return_options:
-        return df, {
+def load_data() -> pd.DataFrame:
+    return pd.read_csv('test.csv')
+
+@st.cache_data
+def get_options(df: pd.DataFrame) -> dict:
+    return {
             'year': sorted(df['year'].dropna().astype(int).unique().tolist(), reverse=True),
             # 'status': ['waiting', 'completed' ,'dropped'],
             # 'type': ['movie', 'series'], 
@@ -27,8 +29,6 @@ def load_data(return_options=False) -> pd.DataFrame:
                 .unique().tolist()
             ), reverse=True),
         }
-
-    return df
 
 def write_data(df: pd.DataFrame) -> None:
     df.to_csv('test.csv', index=False)
