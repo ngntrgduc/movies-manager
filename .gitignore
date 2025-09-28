@@ -9,3 +9,5 @@ test*
 TODO.md
 cli.py
 create_db.py
+demo.py
+devlog.md
