@@ -5,3 +5,7 @@ db.csv
 *.ipynb
 
 test*
+*.sql
+TODO.md
+cli.py
+create_db.py
