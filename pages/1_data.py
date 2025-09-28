@@ -58,4 +58,5 @@ if selected_country:
 
 filtered_df = df[mask]
 st.dataframe(filtered_df, column_config=column_config, hide_index=True)
-st.write(f'Total: **{filtered_df.shape[0]}**')
+st.write(f'Total: **{filtered_df.shape[0]}**, \
+         Memory usage: **{filtered_df.memory_usage().sum() / 1024:.2f} KB**')
