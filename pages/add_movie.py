@@ -6,6 +6,8 @@ from utils.date import get_today, get_year
 
 st.set_page_config(page_title = 'Add movies', page_icon=':heavy_plus_sign:', layout='wide')
 
+df, options = load_data(return_options=True)
+
 # Use session state to clear user input instead of st.form, 
 # so that watch_date is auto-added when the status changes.
 def reset_form() -> None:
@@ -28,7 +30,6 @@ def update_watched_date() -> None:
 
 def add_movie_to_db(record: dict) -> None:
     """Append a new movie record to the database."""
-    df = load_data()
     new_row = pd.DataFrame([record]).astype(df.dtypes.to_dict())
     new_df = pd.concat([df, new_row], ignore_index=True)
     write_data(new_df)
@@ -65,12 +66,11 @@ left_container.text_input('Name', max_chars=150, key='name')
 
 year_bar, type_bar, country_bar = left_container.columns([1, 1, 1], vertical_alignment='bottom')
 year_bar.number_input(
-    'Year', min_value=1900, max_value=get_year(get_today()), 
-    value=None, step=1, key='year'
+    'Year', min_value=1900, max_value=get_year(get_today()), value=None, step=1, key='year'
 )
-type_bar.selectbox('Type', options=['movie', 'series'], key='type')
+type_bar.selectbox('Type', options=options['type'], key='type')
 country_bar.selectbox(
-    'Country', ['China', 'Japan', 'Korea', 'US'], placeholder='Choose or add option', 
+    'Country', options=options['country'], placeholder='Choose or add option', 
     accept_new_options=True, index=None, key='country'
 )
 
