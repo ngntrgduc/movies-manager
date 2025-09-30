@@ -7,7 +7,6 @@ db.csv
 test*
 *.sql
 TODO.md
-cli.py
 create_db.py
 demo.py
 devlog.md
