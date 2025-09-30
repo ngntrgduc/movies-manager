@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from ast import literal_eval
 
-from utils.data import load_data, load_column_config, write_data
+from utils.data import load_data_with_cache, load_column_config, write_data
 
 st.set_page_config(page_title = 'Edit movies', page_icon=':pencil2:', layout='wide')
 
@@ -18,7 +18,7 @@ def prepare_for_save(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # Due to streamlit data editor behavior, don't delete a movie after adding a movie
-df = load_data()
+df = load_data_with_cache()
 edited_df = st.data_editor(
     df,
     column_config=load_column_config(),
@@ -33,5 +33,5 @@ if st.button(
 ):
     saved_df = prepare_for_save(edited_df.copy())
     write_data(saved_df)
-    load_data.clear()  # Clear cache
+    load_data_with_cache.clear()  # Clear cache
     st.toast('Updated database.', icon='✅')

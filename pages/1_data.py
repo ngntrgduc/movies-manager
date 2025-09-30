@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 
-from utils.data import load_data, load_column_config, get_options
+from utils.data import load_data_with_cache, load_column_config, get_options
 
 st.set_page_config(page_title = 'Movies Manager', page_icon=':movie_camera:', layout='wide')
 
-df = load_data()
+df = load_data_with_cache()
 options = get_options(df)
 
 # First bar

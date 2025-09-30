@@ -4,7 +4,7 @@ import pandas as pd
 from .date import get_year
 
 @st.cache_data
-def load_data() -> pd.DataFrame:
+def load_data_with_cache() -> pd.DataFrame:
     # return pd.read_csv('data.csv')
     return pd.read_csv(
         'data/demo.csv', 
