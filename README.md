@@ -47,10 +47,10 @@ uv venv
 ```
 uv sync
 ```
-    - With CLI support
-    ```
-    uv sync --extra cli
-    ```
+- Sync dependencies With CLI support
+```
+uv sync --extra cli
+```
 - Run the app
 ```
 streamlit run app.py
