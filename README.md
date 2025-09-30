@@ -47,7 +47,7 @@ uv venv
 ```
 uv sync
 ```
-- Sync dependencies with CLI support
+- Or sync dependencies with CLI support
 ```
 uv sync --extra cli
 ```
