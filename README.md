@@ -13,6 +13,7 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - Full CRUD support (Create, Read, Update, Delete)
 - Track essential metadata: `name`, `year`, `status`, `type`, `country`, `genres`, `rating`, `watched_date`, `note`
 - Interactive dashboard with Power BI (Streamlit charts are limited and less interactive compared to Power BI)
+- Small CLI for filtering and adding to-watch movie
 
 ## A glimpse
 **Web interface**
@@ -32,7 +33,8 @@ So I built this movie manager as a more convenient way to manage my movie collec
     - If you want to refresh the report, update the data source to point to `data/demo.csv`
 
 ## News
-- **2025-09-29**: 🔥 Release `v0.1.0` - Data stored in a CSV file
+- **2025-09-30**: 🔥 Release `v0.1.1` - Added small CLI
+- **2025-09-29**: Release `v0.1.0` - Data stored in a CSV file
 
 ## Usage
 - Install [uv](https://docs.astral.sh/uv/) (recommended for package management)
@@ -45,6 +47,10 @@ uv venv
 ```
 uv sync
 ```
+    - With CLI support
+    ```
+    uv sync --extra cli
+    ```
 - Run the app
 ```
 streamlit run app.py

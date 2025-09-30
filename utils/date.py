@@ -9,3 +9,8 @@ def get_today() -> str:
     """Return current date as string"""
     from datetime import date
     return date.today().isoformat()
+
+def get_current_year() -> int:
+    """Return current year as integer"""
+    from datetime import date
+    return date.today().year
