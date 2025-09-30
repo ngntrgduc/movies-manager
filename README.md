@@ -55,6 +55,10 @@ uv sync --extra cli
 ```
 streamlit run app.py
 ```
+- Run the CLI (if installed with `--extra cli`):
+```
+py cli.py
+```
 
 ## TODO
 - [ ] Switch to SQLite
