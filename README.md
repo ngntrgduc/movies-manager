@@ -25,8 +25,8 @@ So I built this movie manager as a more convenient way to manage my movie collec
 ![](/images/dashboard.png)
 
 ## Notes
-- `kdrama` = `series` + `korea` (similarly, `cdrama` = `series` + `china`)
-- `anime` = `animation` + `japan`
+- `kdrama` = `series` + `Korea` (similarly, `cdrama` = `series` + `China`)
+- `anime` = `animation` + `Japan`
 - `romcom` = `romance` + `comedy`
 - For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/demo.csv`
 - The Power BI report (`dashboard.pbix`) already contains this sample data:
