@@ -1,5 +1,6 @@
 import click
 import pandas as pd
+from rich import print
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
@@ -61,6 +62,19 @@ def apply_filters(
 
     return df[mask]
 
+def print_stats(df: pd.DataFrame, print_total: bool = True) -> None:
+    """Print DataFrame statistics."""
+    def print_value_counts(name: str, series: pd.Series) -> None:
+        print(name)
+        value_counts = series.value_counts()
+        for value, count in value_counts.items():
+            if count:
+                print(f' - {value}: {count}')
+
+    if print_total:
+        print(f'Total: {df.shape[0]}')
+    for col in ['status', 'type', 'country']:
+        print_value_counts(col.capitalize(), df[col])
 
 # changes the default parameters to -h and --help instead of just --help
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -79,7 +93,8 @@ def cli():
 @click.option('-g', '--genres', help='Filter by genres (comma-separated)')
 @click.option('-w', '--watched-year', help='Filter by watched year')
 @click.option('--sort', help='Sort result by rating', is_flag=True)
-def filter(name, year, status, movie_type, country, genres, watched_year, sort):
+@click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
+def filter(name, year, status, movie_type, country, genres, watched_year, sort, stats):
     """Filter movies by attributes."""
     
     def print_df(df: pd.DataFrame) -> None:
@@ -110,6 +125,8 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort):
     if not filtered_df.empty:
         print_df(filtered_df)
         print(f'Total: {filtered_df.shape[0]}')
+        if stats:
+            print_stats(filtered_df, print_total=False)
     else:
         print('No data.')
 
@@ -185,6 +202,15 @@ def add():
     # new_df.to_csv('data.csv', index=False)
     new_df.to_csv('data/demo.csv', index=False)
     print(f'Added {movie_type}: {name} ({year})')
+
+
+@cli.command()
+def stats():
+    """Show statistics for the movie data."""
+    df = load_data()
+    df.drop('note', axis=1, inplace=True)
+    print_stats(df)
+
 
 if __name__ == '__main__':
     cli()
