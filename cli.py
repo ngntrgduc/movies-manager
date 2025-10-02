@@ -45,7 +45,7 @@ def apply_filters(
     if year:
         mask &= df['year'] == year
     if watched_year:
-        mask &= df['watched_date'].str.startswith(watched_year)
+        mask &= df['watched_date'].str[:4].str.endswith(watched_year)
     if status:
         mask &= filter_by_choice(df['status'], status, ['waiting', 'completed', 'dropped'])
     if movie_type:
@@ -66,11 +66,12 @@ def apply_filters(
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS, no_args_is_help=True)
 def cli():
+    """Command-line tool to manage, filter, and analyze your movie collection."""
     pass
 
 
 @cli.command(no_args_is_help=True)
-@click.option('-n', '--name', help='Filter by movie name (case-insensitive)')
+@click.option('-n', '--name', help='Filter by name (case-insensitive)')
 @click.option('-y', '--year', type=int, help='Filter by release year')
 @click.option('-s', '--status', help="Filter by status: 'waiting', 'completed', or 'dropped'")
 @click.option('-t', '--movie-type', help="Filter by type: 'movie' or 'series'")
