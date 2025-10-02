@@ -8,6 +8,7 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - UI: Streamlit
 - Data: CSV file 
 - Visualization: Power BI
+- CLI: Click + Rich
 
 ## Features
 - Full CRUD support (Create, Read, Update, Delete)
