@@ -62,7 +62,7 @@ def apply_filters(
 
     return df[mask]
 
-def print_stats(df: pd.DataFrame, print_total: bool = True) -> None:
+def print_stats(df: pd.DataFrame, excluded: list = [], print_total: bool = True) -> None:
     """Print DataFrame statistics."""
     def print_value_counts(name: str, series: pd.Series) -> None:
         print(name)
@@ -74,7 +74,8 @@ def print_stats(df: pd.DataFrame, print_total: bool = True) -> None:
     if print_total:
         print(f'Total: {df.shape[0]}')
     for col in ['status', 'type', 'country']:
-        print_value_counts(col.capitalize(), df[col])
+        if col not in excluded:
+            print_value_counts(col.capitalize(), df[col])
 
 # changes the default parameters to -h and --help instead of just --help
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -126,7 +127,13 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
         print_df(filtered_df)
         print(f'Total: {filtered_df.shape[0]}')
         if stats:
-            print_stats(filtered_df, print_total=False)
+            option_to_col = {
+                'status': status,
+                'type': movie_type,
+                'country': country,
+            }
+            excluded = [col for col, val in option_to_col.items() if val]
+            print_stats(filtered_df, excluded, print_total=False)
     else:
         print('No data.')
 
