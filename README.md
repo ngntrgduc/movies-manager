@@ -60,6 +60,19 @@ streamlit run app.py
 ```
 py cli.py
 ```
+```
+Usage: cli.py [OPTIONS] COMMAND [ARGS]...
+
+  Command-line tool to manage, filter, and analyze your movie collection.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  add     Add a new movie interactively (default status: waiting).
+  filter  Filter movies by attributes.
+  stats   Show statistics for the movie data.
+```
 
 ## TODO
 - [ ] Switch to SQLite
