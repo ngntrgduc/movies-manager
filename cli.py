@@ -186,20 +186,64 @@ def add():
 
     name = click.prompt('Name')
     year = click.prompt('Year', value_proc=valid_year, **skippable_settings)
+    status = prompt_with_choice(
+        'Status', ['waiting', 'completed', 'dropped'], 
+        **{'default': 'waiting', 'show_default': True}
+    )
     movie_type = prompt_with_choice('Type', ['movie', 'series'])
     country = prompt_with_choice('Country', ['China', 'Japan', 'Korea', 'US'], **skippable_settings)
     genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
+
+    if status != 'waiting':
+        def valid_rating(rating):
+            """Validate rating input, returning a number or None if blank."""
+            if rating.strip() == '':
+                return None
+            
+            try:
+                rating = int(rating)
+            except ValueError:
+                raise click.BadParameter('Rating must be an integer')
+
+            if rating < 1 or rating > 10:
+                raise click.BadParameter(f'Rating must be between 1 and 10')
+
+            return rating
+
+        rating = click.prompt('Rating', value_proc=valid_rating, **skippable_settings)
+        
+        def valid_date(date):
+            from datetime import datetime
+            if date.strip() == '':
+                return ''
+
+            formats = ['%Y', '%Y-%m', '%Y-%m-%d']
+            for format in formats:
+                try:
+                    return datetime.strptime(date, format).strftime(format)
+                except ValueError:
+                    continue
+
+            raise click.BadParameter(
+                f"'{date}' does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
+            )
+
+        watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
+    else:
+        rating = None
+        watched_date = ''
+
     note = click.prompt('Note', **skippable_settings)
 
     new_record = {
         'name': name.strip(),
         'year': year,
-        'status': 'waiting',
+        'status': status,
         'type': movie_type,
         'country': country,
         'genres': genres,
-        'rating': None,
-        'watched_date': '',
+        'rating': rating,
+        'watched_date': watched_date,
         'note': note.strip()
     }
 
