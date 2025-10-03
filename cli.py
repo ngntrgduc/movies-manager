@@ -144,7 +144,7 @@ def add():
     from utils.cli import IntRangeOrNone
     from utils.date import get_current_year
 
-    def format_genres(genres) -> str:
+    def format_genres(genres: str) -> str:
         """Normalize comma-separated genres by stripping whitespace and removing empties."""
         return ','.join(
             genre for genre in (g.strip() for g in genres.split(',')) if genre
@@ -179,13 +179,16 @@ def add():
     country = prompt_with_choice('Country', ['China', 'Japan', 'Korea', 'US'], **skippable_settings)
     genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
 
-    if status != 'waiting':
+    if status == 'waiting':
+        rating = None
+        watched_date = ''
+    else:
         rating = click.prompt(
             'Rating', type=IntRangeOrNone(1, 10, clamp=True, allow_blank=True), 
             **skippable_settings
         )
         
-        def valid_date(date):
+        def valid_date(date: str) -> str:
             from datetime import datetime
             if date.strip() == '':
                 return ''
@@ -202,9 +205,6 @@ def add():
             )
 
         watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
-    else:
-        rating = None
-        watched_date = ''
 
     note = click.prompt('Note', **skippable_settings)
 
