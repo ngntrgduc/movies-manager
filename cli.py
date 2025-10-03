@@ -165,20 +165,17 @@ def add():
             genre for genre in (g.strip() for g in genres.split(',')) if genre
         )
 
-    def click_resolve_choice(value: str, choices: list[str]) -> str | None:
-        """Click adapter for resolve_choice."""
-        try:
-            # raise ValueError on invalid input
-            return resolve_choice(value, choices, strict=True)
-        except ValueError as e:
-            raise click.BadParameter(str(e))
-
     def prompt_with_choice(text: str, choices: list[str], **kwargs) -> str:
         """Prompt user for input and resolve it against choices."""
         def value_proc(value):
             if not value.strip():   # allow skip
                 return ''
-            return click_resolve_choice(value, choices)
+            
+            try:
+                # raise ValueError on invalid input
+                return resolve_choice(value, choices, strict=True)
+            except ValueError as e:
+                raise click.BadParameter(str(e))
         
         return click.prompt(f"{text} ({', '.join(choices)})", value_proc=value_proc, **kwargs)
 
