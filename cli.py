@@ -21,7 +21,7 @@ def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str 
     if strict:
         raise ValueError(
             # Click-like error message
-            f"'{value}' is not one of {', '.join(f"'{c}'" for c in choices)} or their initials."
+            f"{value!r} is not one of {', '.join(repr(c) for c in choices)} or their initials."
         )
 
     return None
@@ -225,7 +225,7 @@ def add():
                     continue
 
             raise click.BadParameter(
-                f"'{date}' does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
+                f"{date!r} does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
             )
 
         watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
@@ -252,7 +252,7 @@ def add():
     new_df = pd.concat([df, new_row], ignore_index=True)
     # new_df.to_csv('data.csv', index=False)
     new_df.to_csv('data/demo.csv', index=False)
-    print(f'Added {movie_type}: {name} ({year})')
+    print(f'Added {movie_type}: {name!r} ({year})')
 
 
 @cli.command()
