@@ -141,23 +141,8 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
 @cli.command()
 def add():
     """Add a new movie interactively (default status: waiting)."""
-    def valid_year(year: str) -> int | None:
-        """Validate year input, returning a number or None if blank."""
-        from utils.date import get_current_year
-        current_year = get_current_year()
-
-        if year.strip() == '':
-            return None
-
-        try:
-            year = int(year)
-        except ValueError:
-            raise click.BadParameter('Year must be a number')
-        
-        if year < 1900 or year > current_year:
-            raise click.BadParameter(f'Year must be between 1900 and {current_year}')
-
-        return year
+    from utils.cli import IntRangeOrNone
+    from utils.date import get_current_year
 
     def format_genres(genres) -> str:
         """Normalize comma-separated genres by stripping whitespace and removing empties."""
@@ -182,7 +167,10 @@ def add():
     skippable_settings = {'default': '', 'show_default': False}
 
     name = click.prompt('Name')
-    year = click.prompt('Year', value_proc=valid_year, **skippable_settings)
+    year = click.prompt(
+        'Year', type=IntRangeOrNone(1900, get_current_year(), allow_blank=True),
+        **skippable_settings
+    )
     status = prompt_with_choice(
         'Status', ['waiting', 'completed', 'dropped'], 
         **{'default': 'waiting', 'show_default': True}
@@ -192,22 +180,10 @@ def add():
     genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
 
     if status != 'waiting':
-        def valid_rating(rating):
-            """Validate rating input, returning a number or None if blank."""
-            if rating.strip() == '':
-                return None
-            
-            try:
-                rating = int(rating)
-            except ValueError:
-                raise click.BadParameter('Rating must be an integer')
-
-            if rating < 1 or rating > 10:
-                raise click.BadParameter(f'Rating must be between 1 and 10')
-
-            return rating
-
-        rating = click.prompt('Rating', value_proc=valid_rating, **skippable_settings)
+        rating = click.prompt(
+            'Rating', type=IntRangeOrNone(1, 10, clamp=True, allow_blank=True), 
+            **skippable_settings
+        )
         
         def valid_date(date):
             from datetime import datetime
