@@ -103,7 +103,9 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
         from rich.console import Console
         from rich.table import Table
 
-        console = Console()
+        # Remove empty columns (e.g., rating, watched_date for 'waiting' status)
+        df = df.dropna(axis=1, how='all')
+
         table = Table(show_header=True, header_style='bold blue')
         for column in df.columns:
             table.add_column(column)
@@ -111,6 +113,7 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
         for _, row in df.iterrows():
             table.add_row(*[str(x) if pd.notna(x) else '' for x in row])
 
+        console = Console()
         console.print(table)
 
     df = load_data()
