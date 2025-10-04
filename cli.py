@@ -235,7 +235,7 @@ def add():
 def stats():
     """Show statistics for the movie data."""
     df = load_data()
-    df.drop('note', axis=1, inplace=True)
+    # df.drop('note', axis=1, inplace=True)
     print_stats(df)
 
 
