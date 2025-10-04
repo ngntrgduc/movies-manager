@@ -120,7 +120,7 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
     # For table displaying purpose
     df['year'] = df['year'].astype('Int64')
     df['rating'] = df['rating'].astype('Int64')
-    df.drop('note', axis=1, inplace=True)
+    # df.drop('note', axis=1, inplace=True)
 
     filtered_df = apply_filters(df, name, year, status, movie_type, country, genres, watched_year)
     if sort:
