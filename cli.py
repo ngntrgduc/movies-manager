@@ -93,7 +93,7 @@ def cli():
 @click.option('-c', '--country', help='Filter by country')
 @click.option('-g', '--genres', help='Filter by genres (comma-separated)')
 @click.option('-w', '--watched-year', help='Filter by watched year')
-@click.option('--sort', help='Sort result by rating', is_flag=True)
+@click.option('--sort', help='Sort result by rating or watched date')
 @click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
 def filter(name, year, status, movie_type, country, genres, watched_year, sort, stats):
     """Filter movies by attributes."""
@@ -123,9 +123,16 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
     # df.drop('note', axis=1, inplace=True)
 
     filtered_df = apply_filters(df, name, year, status, movie_type, country, genres, watched_year)
+
+    sort = sort.strip() if sort else None
     if sort:
-        filtered_df = filtered_df.sort_values(by='rating', ascending=False)
-    
+        try: 
+            resolved = resolve_choice(sort, ['rating', 'watched_date'], strict=True)
+            ascending = resolved == 'watched_date'
+            filtered_df = filtered_df.sort_values(by=[resolved], ascending=ascending)
+        except ValueError as e:
+            raise click.BadParameter(str(e))
+
     if not filtered_df.empty:
         print_df(filtered_df)
         print(f'Total: {filtered_df.shape[0]}')
@@ -169,7 +176,7 @@ def add():
 
     skippable_settings = {'default': '', 'show_default': False}
 
-    name = click.prompt('Name')
+    name = click.prompt('Name').strip()
     year = click.prompt(
         'Year', type=IntRangeOrNone(1900, get_current_year(), allow_blank=True),
         **skippable_settings
@@ -212,7 +219,7 @@ def add():
     note = click.prompt('Note', **skippable_settings)
 
     new_record = {
-        'name': name.strip(),
+        'name': name,
         'year': year,
         'status': status,
         'type': movie_type,
