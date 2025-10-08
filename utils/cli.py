@@ -1,7 +1,7 @@
 import click
 
 class IntRangeOrNone(click.ParamType):
-    """Extended click.IntRange type with an allow_blank option."""
+    """Extended click.IntRange type, allow blank by default."""
     name = 'integer'
 
     def __init__(self, min=None, max=None, clamp=False, allow_blank=True):
@@ -11,7 +11,7 @@ class IntRangeOrNone(click.ParamType):
         self.allow_blank = allow_blank
 
     def convert(self, value, param, ctx):
-        # Handle blanks
+        # Handle blanks because Click does not return None when skipping input
         if isinstance(value, str) and value.strip() == '':
             if self.allow_blank:
                 return None
