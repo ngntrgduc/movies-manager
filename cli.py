@@ -160,19 +160,21 @@ def add():
             genre for genre in (g.strip() for g in genres.split(',')) if genre
         )
 
-    def prompt_with_choice(text: str, choices: list[str], **kwargs) -> str:
-        """Prompt user for input and resolve it against choices."""
-        def value_proc(value):
-            if not value.strip():   # allow skip
-                return ''
-            
-            try:
-                # raise ValueError on invalid input
-                return resolve_choice(value, choices, strict=True)
-            except ValueError as e:
-                raise click.BadParameter(str(e))
+    class AbbrevChoice(click.Choice):
+        """Choice type with abbreviation, case-insensitive matching."""
+        name = 'choice'
+
+        def __init__(self, choices):
+            super().__init__(choices)
         
-        return click.prompt(f"{text} ({', '.join(choices)})", value_proc=value_proc, **kwargs)
+        def convert(self, value, param, ctx):
+            if isinstance(value, str) and value.strip() == '':
+                return ''
+
+            try:
+                return resolve_choice(value, self.choices, strict=True)
+            except ValueError as e:
+                self.fail(str(e), param, ctx)
 
     skippable_settings = {'default': '', 'show_default': False}
 
@@ -181,12 +183,13 @@ def add():
         'Year', type=IntRangeOrNone(1900, get_current_year(), allow_blank=True),
         **skippable_settings
     )
-    status = prompt_with_choice(
-        'Status', ['waiting', 'completed', 'dropped'], 
-        **{'default': 'waiting', 'show_default': True}
+    status = click.prompt(
+        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']), default='waiting'
     )
-    movie_type = prompt_with_choice('Type', ['movie', 'series'])
-    country = prompt_with_choice('Country', ['China', 'Japan', 'Korea', 'US'], **skippable_settings)
+    movie_type = click.prompt('Type', type=AbbrevChoice(['movie', 'series']))
+    country = click.prompt(
+        'Country', type=AbbrevChoice(['China', 'Japan', 'Korea', 'US']), **skippable_settings
+    )
     genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
 
     if status == 'waiting':
