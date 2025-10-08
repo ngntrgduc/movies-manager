@@ -180,8 +180,7 @@ def add():
 
     name = click.prompt('Name').strip()
     year = click.prompt(
-        'Year', type=IntRangeOrNone(1900, get_current_year(), allow_blank=True),
-        **skippable_settings
+        'Year', type=IntRangeOrNone(1900, get_current_year()), **skippable_settings
     )
     status = click.prompt(
         'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']), default='waiting'
@@ -197,8 +196,7 @@ def add():
         watched_date = ''
     else:
         rating = click.prompt(
-            'Rating', type=IntRangeOrNone(1, 10, clamp=True, allow_blank=True), 
-            **skippable_settings
+            'Rating', type=IntRangeOrNone(1, 10, clamp=True), **skippable_settings
         )
         
         def valid_date(date: str) -> str:
@@ -219,7 +217,7 @@ def add():
 
         watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
 
-    note = click.prompt('Note', **skippable_settings)
+    note = click.prompt('Note', **skippable_settings).strip()
 
     new_record = {
         'name': name,
@@ -230,7 +228,7 @@ def add():
         'genres': genres,
         'rating': rating,
         'watched_date': watched_date,
-        'note': note.strip()
+        'note': note
     }
 
     df = load_data()
