@@ -32,9 +32,10 @@ So I built this movies manager as a more convenient way to manage my movie colle
 - For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/demo.csv`.
 - The Power BI report (`dashboard.pbix`) already contains sample data. If you want to refresh the report, update the data source to point to `data/demo.csv`.
 
-## News
-- **2025-09-30**: 🔥 Release `v0.1.1` - Added small CLI
-- **2025-09-29**: Release `v0.1.0` - Data stored in a CSV file
+## Recent updates
+- `v0.1.2` - Improved CLI
+- `v0.1.1` - Added small CLI
+- `v0.1.0` - Data stored in a CSV file
 
 ## Usage
 - Install [uv](https://docs.astral.sh/uv/) (recommended for package management)
@@ -77,6 +78,8 @@ Commands:
 - [ ] Switch to SQLite
     - [ ] cache_resource for database connection
     - [ ] Allow multiline note
+    - [ ] Backup mechanism
+    - [ ] Delete/Edit specific genre
 - [ ] Add input validation for Add and Edit page
 - [ ] Movies recommendation using ML + Model Compression
 
