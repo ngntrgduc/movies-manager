@@ -28,7 +28,7 @@ def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str 
 
 def apply_filters(
         df, name=None, year=None, status=None, movie_type=None, 
-        country=None, genres=None, watched_year=None
+        country=None, genres=None, rating=None, watched_year=None
 ) -> pd.DataFrame:
     """Apply filters to the movie DataFrame."""
 
@@ -59,6 +59,8 @@ def apply_filters(
             df['genres'].fillna('') .apply(lambda x: {g.strip() for g in x.split(',') if g.strip()})
         )
         mask &= genres_set.apply(lambda g: set(genres).issubset(g))
+    if rating:
+        mask &= df['rating'] == rating
 
     return df[mask]
 
@@ -92,10 +94,12 @@ def cli():
 @click.option('-t', '--movie-type', help="Filter by type: 'movie' or 'series'")
 @click.option('-c', '--country', help='Filter by country')
 @click.option('-g', '--genres', help='Filter by genres (comma-separated)')
+@click.option('-r', '--rating', type=click.IntRange(1, 10, clamp=True), help='Filter by rating')
 @click.option('-w', '--watched-year', help='Filter by watched year')
 @click.option('--sort', help='Sort result by rating or watched date')
 @click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
-def filter(name, year, status, movie_type, country, genres, watched_year, sort, stats):
+@click.option('--note', help='Show notes', is_flag=True)
+def filter(name, year, status, movie_type, country, genres, rating, watched_year, sort, stats, note):
     """Filter movies by attributes."""
     
     def print_df(df: pd.DataFrame) -> None:
@@ -120,9 +124,12 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
     # For table displaying purpose
     df['year'] = df['year'].astype('Int64')
     df['rating'] = df['rating'].astype('Int64')
-    # df.drop('note', axis=1, inplace=True)
+    if not note:
+        df.drop('note', axis=1, inplace=True)
 
-    filtered_df = apply_filters(df, name, year, status, movie_type, country, genres, watched_year)
+    filtered_df = apply_filters(
+        df, name, year, status, movie_type, country, genres, rating, watched_year
+    )
 
     sort = sort.strip() if sort else None
     if sort:
@@ -150,7 +157,7 @@ def filter(name, year, status, movie_type, country, genres, watched_year, sort, 
 
 @cli.command()
 def add():
-    """Add a new movie interactively (default status: waiting)."""
+    """Add a new movie interactively."""
     from utils.cli import IntRangeOrNone
     from utils.date import get_current_year
 
@@ -162,8 +169,6 @@ def add():
 
     class AbbrevChoice(click.Choice):
         """Choice type with abbreviation, case-insensitive matching."""
-        name = 'choice'
-
         def __init__(self, choices):
             super().__init__(choices)
         
