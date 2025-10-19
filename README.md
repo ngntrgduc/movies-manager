@@ -29,8 +29,9 @@ So I built this movies manager as a more convenient way to manage my movie colle
 - `kdrama` = `series` + `Korea` (similarly, `cdrama` = `series` + `China`)
 - `anime` = `animation` + `Japan`
 - `romcom` = `romance` + `comedy`
-- For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/demo.csv`.
-- The Power BI report (`dashboard.pbix`) already contains sample data. If you want to refresh the report, update the data source to point to `data/demo.csv`.
+- For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/data.csv`.
+- The Power BI report (`dashboard.pbix`) already contains sample data. If you want to refresh the report, update the data source to point to `data/data.csv`.
+- Click is bad at handling clickable links, so it recommended to view notes in Streamlit web version instead of CLI.
 
 ## Recent updates
 - `v0.1.2` - Improved CLI
@@ -82,5 +83,7 @@ Commands:
     - [ ] Delete/Edit specific genre
 - [ ] Add input validation for Add and Edit page
 - [ ] Movies recommendation using ML + Model Compression
+- [ ] Calling LLM API for smart summarize like: total watched time,... using name and year field
+  - [ ] As a chatbot interface?
 
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.

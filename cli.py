@@ -8,7 +8,7 @@ def load_data():
     """Return data as a pandas DataFrame."""
     import pandas as pd
     # return pd.read_csv('data.csv')
-    return pd.read_csv('data/demo.csv', dtype={'note': 'string'})  
+    return pd.read_csv('data/data.csv', dtype={'note': 'string'})  
 
 def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str | None:
     """Resolve user input against choices with abbreviation and case-insensitive support."""
@@ -244,7 +244,7 @@ def add():
     new_row = pd.DataFrame([new_record]).astype(df.dtypes.to_dict())
     new_df = pd.concat([df, new_row], ignore_index=True)
     # new_df.to_csv('data.csv', index=False)
-    new_df.to_csv('data/demo.csv', index=False)
+    new_df.to_csv('data/data.csv', index=False)
     print(f'Added {movie_type}: {name!r} ({year})')
 
 
