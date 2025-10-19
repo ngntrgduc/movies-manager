@@ -251,6 +251,15 @@ def stats():
     # df.drop('note', axis=1, inplace=True)
     print_stats(df)
 
+@cli.command()
+def backup():
+    """Back up data."""
+    try:
+        df = load_data()
+        df.to_csv('backup.csv', index=False)
+        print('Backup successful.')
+    except Exception as e:
+        print(f'Backup failed: {e}')
 
 if __name__ == '__main__':
     cli()
