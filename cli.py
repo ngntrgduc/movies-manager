@@ -260,7 +260,7 @@ def backup():
     """Back up data."""
     try:
         df = load_data()
-        df.to_csv('backup.csv', index=False)
+        df.to_csv('data/backup.csv', index=False)
         print('Backup successful.')
     except Exception as e:
         print(f'Backup failed: {e}')
