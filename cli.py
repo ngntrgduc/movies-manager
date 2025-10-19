@@ -1,11 +1,12 @@
 import click
-import pandas as pd
 from rich import print
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
 # Therefore, we define a separate load_data function here without caching.
-def load_data() -> pd.DataFrame:
+def load_data():
+    """Return data as a pandas DataFrame."""
+    import pandas as pd
     # return pd.read_csv('data.csv')
     return pd.read_csv('data/demo.csv', dtype={'note': 'string'})  
 
@@ -29,8 +30,9 @@ def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str 
 def apply_filters(
         df, name=None, year=None, status=None, movie_type=None, 
         country=None, genres=None, rating=None, watched_year=None
-) -> pd.DataFrame:
+):
     """Apply filters to the movie DataFrame."""
+    import pandas as pd
 
     def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
         """Return a boolean mask for rows where the series matches a resolved choice."""
@@ -64,9 +66,9 @@ def apply_filters(
 
     return df[mask]
 
-def print_stats(df: pd.DataFrame, excluded: list = [], print_total: bool = True) -> None:
+def print_stats(df, excluded: list = [], print_total: bool = True) -> None:
     """Print DataFrame statistics."""
-    def print_value_counts(name: str, series: pd.Series) -> None:
+    def print_value_counts(name: str, series) -> None:
         print(name)
         value_counts = series.value_counts()
         for value, count in value_counts.items():
@@ -101,7 +103,8 @@ def cli():
 @click.option('--note', help='Show notes', is_flag=True)
 def filter(name, year, status, movie_type, country, genres, rating, watched_year, sort, stats, note):
     """Filter movies by attributes."""
-    
+    import pandas as pd
+
     def print_df(df: pd.DataFrame) -> None:
         """Display a DataFrame as a rich table."""
         from rich.console import Console
@@ -158,6 +161,7 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
 @cli.command()
 def add():
     """Add a new movie interactively."""
+    import pandas as pd
     from utils.cli import IntRangeOrNone
     from utils.date import get_current_year
 
