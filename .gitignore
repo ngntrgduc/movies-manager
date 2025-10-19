@@ -1,16 +1,14 @@
 .venv
 __pycache__
 archive
-db.csv
 *.ipynb
 
 test*
 *.sql
+sql.py
 TODO.md
 create_db.py
 demo.py
 devlog.md
 
-# dashboard.pbix
-personal_dashboard.pbix
 data.csv
