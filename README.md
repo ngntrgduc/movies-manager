@@ -30,7 +30,7 @@ So I built this movies manager as a more convenient way to manage my movie colle
 - `anime` = `animation` + `Japan`
 - `romcom` = `romance` + `comedy`
 - For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/data.csv`.
-- The Power BI report (`dashboard.pbix`) already contains sample data. If you want to refresh the report, update the data source to point to `data/data.csv`.
+- Remember to refresh all tables to get the latest data in the Power BI report (`dashboard.pbix`).
 - Click is bad at handling clickable links, so it recommended to view notes in Streamlit web version instead of CLI.
 
 ## Recent updates
@@ -70,7 +70,8 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  add     Add a new movie interactively (default status: waiting).
+  add     Add a new movie interactively.
+  backup  Back up data.
   filter  Filter movies by attributes.
   stats   Show statistics for the movie data.
 ```
