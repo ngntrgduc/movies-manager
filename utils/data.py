@@ -43,7 +43,7 @@ def load_column_config() -> dict:
     """Load column config for Streamlit dataframe and data editor"""
     return {
         'name': st.column_config.TextColumn(pinned=True, width='medium', required=True),
-        'year': st.column_config.NumberColumn(width=8),
+        'year': st.column_config.NumberColumn(width=8, required=True),
         'status': st.column_config.SelectboxColumn(
             width=35, options=['waiting', 'completed', 'dropped'], default='waiting', required=True
         ),
@@ -51,7 +51,7 @@ def load_column_config() -> dict:
             width=20, options=['movie', 'series'], required=True
         ),
         'country': st.column_config.TextColumn(width=10),
-        'genres': st.column_config.ListColumn(width='medium'),
+        'genres': st.column_config.ListColumn(width='medium', required=True),
         'rating': st.column_config.NumberColumn(width=5, min_value=0, max_value=10),
         'date': st.column_config.TextColumn(width=30),
         'note': st.column_config.TextColumn(width='small'),
