@@ -28,4 +28,4 @@
     - streamlit and click already provide simple validation method, so no need for pydantic
 - Add toggle in sidebar for: Widgets only show values available in the currently filtered dataset -> Too much to handle, and default filtering feel more natural
 - Better (short) year filtering in CLI -> not long-term compatible, what will happen if the year 2100s come? this hard to handle
-    # mask &= ((df['year'] == year) | (df['year'] % 1000 == year)) # handles short year like 25 for 2025
+    - ```# mask &= ((df['year'] == year) | (df['year'] % 1000 == year)) # handles short year like 25 for 2025```
