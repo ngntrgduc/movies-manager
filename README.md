@@ -76,15 +76,4 @@ Commands:
   stats   Show statistics for the movie data.
 ```
 
-## TODO
-- [ ] Switch to SQLite
-    - [ ] cache_resource for database connection
-    - [ ] Allow multiline note
-    - [ ] Backup mechanism
-    - [ ] Delete/Edit specific genre
-- [ ] Add input validation for Add and Edit page
-- [ ] Movies recommendation using ML + Model Compression
-- [ ] Calling LLM API for smart summarize like: total watched time,... using name and year field
-  - [ ] As a chatbot interface?
-
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.
