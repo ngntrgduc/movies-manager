@@ -1,12 +1,11 @@
 ## Todo
 - [ ] Switch to SQLite
     - [ ] For genres, using Many-to-Many Relationship approach (junction tables)
-    - display all genres of a movie (maybe using CTE), select from db and convert it to df to render 
+    - [ ] display all genres of a movie (maybe using CTE), select from db and convert it to df to render 
     - [ ] cache_resource for database connection
     - [ ] Allow multiline note
     - [ ] Backup mechanism
     - [ ] Delete/Edit specific genre by SQL
-
 - [ ] Add `restore` command to restore from backup
 - [ ] Add input validation for Add and Edit page
 - [ ] Genres edit page
@@ -20,9 +19,7 @@
 ## Done
 - [x] Optimize performance by using cache
 - [x] change status to dropped or completed auto add date to watched date
-- When changing status, also update genres, too:
 - [x] CLI interface with `click`
-- [x] Handle when there are no data.csv file or just inform user to create it
 
 
 ## Abandoned
