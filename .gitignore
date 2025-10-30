@@ -5,10 +5,6 @@ archive
 
 test*
 *.sql
-sql.py
-TODO.md
-create_db.py
-demo.py
 devlog.md
 
 data.csv
