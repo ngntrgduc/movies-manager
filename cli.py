@@ -103,6 +103,14 @@ def cli():
 @click.option('--note', help='Show notes', is_flag=True)
 def filter(name, year, status, movie_type, country, genres, rating, watched_year, sort, stats, note):
     """Filter movies by attributes."""
+
+    # Prevent printing all movies to the command line when using with just flags
+    filters = [name, year, status, movie_type, country, genres, rating, watched_year]
+    has_filter = any(arg is not None for arg in filters)
+    if not has_filter:
+        print('No filters specified. Use --help to see available options.')
+        return
+
     import pandas as pd
 
     def print_df(df: pd.DataFrame) -> None:
