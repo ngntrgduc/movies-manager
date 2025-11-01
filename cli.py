@@ -266,9 +266,9 @@ def stats():
 @cli.command()
 def backup():
     """Back up data."""
+    import shutil
     try:
-        df = load_data()
-        df.to_csv('data/backup.csv', index=False)
+        shutil.copyfile('data/data.csv', 'data/backup.csv')
         print('Backup successful.')
     except Exception as e:
         print(f'Backup failed: {e}')
