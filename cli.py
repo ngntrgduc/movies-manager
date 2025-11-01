@@ -273,5 +273,30 @@ def backup():
     except Exception as e:
         print(f'Backup failed: {e}')
 
+@cli.command()
+def restore():
+    """Restore data from backup."""
+    from pathlib import Path
+    import shutil
+
+    backup_file = 'data/backup.csv'
+    data_file = 'data/data.csv'
+
+    if not Path(backup_file).exists():
+        print("Backup file not found. Run 'backup' first.")
+        return
+
+    click.confirm(
+        f'This will replace your current movie data with the backup file. Continue?',
+        abort=True
+    )
+
+    try:
+        shutil.copyfile(backup_file, data_file)
+        print('Restore successful.')
+    except Exception as e:
+        print(f'Restore failed: {e}')
+
+
 if __name__ == '__main__':
     cli()
