@@ -70,10 +70,11 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  add     Add a new movie interactively.
-  backup  Back up data.
-  filter  Filter movies by attributes.
-  stats   Show statistics for the movie data.
+  add      Add a new movie interactively.
+  backup   Back up data.
+  filter   Filter movies by attributes.
+  restore  Restore data from backup.
+  stats    Show statistics for the movie data.
 ```
 
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.
