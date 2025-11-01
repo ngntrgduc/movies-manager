@@ -1,8 +1,8 @@
-## Movies manager
-A simple movies manager built with Streamlit.
+## Movie manager
+A simple movie manager built with Streamlit.
 
 Story: I originally tracked my movie-watching journey in Notion (web). But adding new movies in Notion was painful, and once I had more than 100 movies, it became laggy 🙂.
-So I built this movies manager as a more convenient way to manage my movie collection.
+So I built this movie manager as a more convenient way to manage my movie collection.
 
 ## Tech stack
 - UI: Streamlit
@@ -31,7 +31,7 @@ So I built this movies manager as a more convenient way to manage my movie colle
 - `romcom` = `romance` + `comedy`
 - For privacy reasons, this repo only includes a small sample of my original dataset, stored in `data/data.csv`.
 - Remember to refresh all tables to get the latest data in the Power BI report (`dashboard.pbix`).
-- Click is bad at handling clickable links, so it recommended to view notes in Streamlit web version instead of CLI.
+- Click is bad at handling clickable links, so it is recommended to view notes in Streamlit web version instead of CLI.
 
 ## Recent updates
 - `v0.1.2` - Improved CLI
