@@ -17,8 +17,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
  -->
+## [[v0.1.3](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.1.3)]
 
-## [[v0.1.2](https://github.com/ngntrgduc/movies-manager/releases/tag/v0.1.2)]
+### Added
+CLI:
+- `rating` filtering
+- `backup` command, store backup in `data` folder
+- `restore` command to restore data from backup
+
+### Changed
+- Rename `demo.csv` to `data.csv`, no more manual handling data file when working
+- `genres`, `year` field is required in Edit page
+- Change repo name from `movies-manager` to `movie-manager`, fix links in CHANGELOG
+
+CLI:
+- Hide `note` column, enable show `note` column using `--note` flag
+
+### Fixed
+- Prevent printing all movies in the command line when using `filter` command with just flags
+
+## [[v0.1.2](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.1.2)]
 
 CLI improvement.
 
@@ -37,12 +55,12 @@ CLI improvement.
 - From `--sort` flag to `--sort` option handling: support `watched_date` sorting
 - Use `AbbrevChoice` instead of `prompt_with_choice` function, reduce cognitive load (value_proc, custom Click-based prompt message). Using custome Choice type is more natural when prompting, with default promp message from Click.
 
-## [[v0.1.1](https://github.com/ngntrgduc/movies-manager/releases/tag/v0.1.1)]
+## [[v0.1.1](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.1.1)]
 
 ### Added
 - CLI: filtering and adding to-watch (waiting) movie.
 
-## [[v0.1.0](https://github.com/ngntrgduc/movies-manager/releases/tag/v0.1.0)]
+## [[v0.1.0](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.1.0)]
 
 ### Added
 - Basic web interface: Data (overview), Add, and Edit page (CRUD)

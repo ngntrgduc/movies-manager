@@ -34,6 +34,7 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - Click is bad at handling clickable links, so it is recommended to view notes in Streamlit web version instead of CLI.
 
 ## Recent updates
+- `v0.1.3` - Added backup/restore, rating filter, and refinements to CLI
 - `v0.1.2` - Improved CLI
 - `v0.1.1` - Added small CLI
 - `v0.1.0` - Data stored in a CSV file
