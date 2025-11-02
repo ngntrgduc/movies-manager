@@ -1,14 +1,16 @@
 import click
 from rich import print
 
+DATA_FILE = 'data/data.csv'
+BACKUP_FILE = 'data/backup.csv'
+
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
 # Therefore, we define a separate load_data function here without caching.
 def load_data():
     """Return data as a pandas DataFrame."""
     import pandas as pd
-    # return pd.read_csv('data.csv')
-    return pd.read_csv('data/data.csv', dtype={'note': 'string'})  
+    return pd.read_csv(DATA_FILE, dtype={'note': 'string'})  
 
 def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str | None:
     """Resolve user input against choices with abbreviation and case-insensitive support."""
@@ -251,8 +253,7 @@ def add():
     df = load_data()
     new_row = pd.DataFrame([new_record]).astype(df.dtypes.to_dict())
     new_df = pd.concat([df, new_row], ignore_index=True)
-    # new_df.to_csv('data.csv', index=False)
-    new_df.to_csv('data/data.csv', index=False)
+    new_df.to_csv(DATA_FILE, index=False)
     print(f'Added {movie_type}: {name!r} ({year})')
 
 
@@ -260,7 +261,6 @@ def add():
 def stats():
     """Show statistics for the movie data."""
     df = load_data()
-    # df.drop('note', axis=1, inplace=True)
     print_stats(df)
 
 @cli.command()
@@ -268,7 +268,7 @@ def backup():
     """Back up data."""
     import shutil
     try:
-        shutil.copyfile('data/data.csv', 'data/backup.csv')
+        shutil.copyfile(DATA_FILE, BACKUP_FILE)
         print('Backup successful.')
     except Exception as e:
         print(f'Backup failed: {e}')
@@ -279,10 +279,7 @@ def restore():
     from pathlib import Path
     import shutil
 
-    backup_file = 'data/backup.csv'
-    data_file = 'data/data.csv'
-
-    if not Path(backup_file).exists():
+    if not Path(BACKUP_FILE).exists():
         print("Backup file not found. Run 'backup' first.")
         return
 
@@ -292,7 +289,7 @@ def restore():
     )
 
     try:
-        shutil.copyfile(backup_file, data_file)
+        shutil.copyfile(BACKUP_FILE, DATA_FILE)
         print('Restore successful.')
     except Exception as e:
         print(f'Restore failed: {e}')

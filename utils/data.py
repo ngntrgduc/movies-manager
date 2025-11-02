@@ -56,17 +56,3 @@ def load_column_config() -> dict:
         'date': st.column_config.TextColumn(width=30),
         'note': st.column_config.TextColumn(width='small'),
     }
-
-
-def from_csv_to_db(df):
-    """Transfer data from dataframe to database"""
-    for index, row in df.iterrows():
-        query = f'INSERT INTO movies VALUES ()'
-    raise NotImplementedError
-
-
-def get_genres():
-    """Get genres of a movie from database"""
-    # TODO using CTE or something to represent genres as list
-    f"SELECT concat_ws(',', genres) as genres FROM world"
-    raise NotImplementedError
