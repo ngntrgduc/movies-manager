@@ -1,20 +1,20 @@
-## Movie manager
+# Movie manager
 A simple movie manager built with Streamlit.
 
 Story: I originally tracked my movie-watching journey in Notion (web). But adding new movies in Notion was painful, and once I had more than 100 movies, it became laggy 🙂.
 So I built this movie manager as a more convenient way to manage my movie collection.
 
+## Features
+- Full CRUD support
+- Track essential metadata: `name`, `year`, `status`, `type`, `country`, `genres`, `rating`, `watched_date`, `note`
+- Interactive dashboard with Power BI (Streamlit charts are limited and less interactive compared to Power BI)
+- CLI to add, filter, and analyze movie data.
+
 ## Tech stack
-- UI: Streamlit
+- Web UI: Streamlit
 - Data: CSV file 
 - Visualization: Power BI
 - CLI: Click + Rich
-
-## Features
-- Full CRUD support (Create, Read, Update, Delete)
-- Track essential metadata: `name`, `year`, `status`, `type`, `country`, `genres`, `rating`, `watched_date`, `note`
-- Interactive dashboard with Power BI (Streamlit charts are limited and less interactive compared to Power BI)
-- Small CLI for filtering and adding movies
 
 ## A glimpse
 **Web interface**
