@@ -4,7 +4,7 @@ import pandas as pd
 from utils.data import load_data_with_cache, write_data, get_options
 from utils.date import get_today, get_year
 
-st.set_page_config(page_title = 'Add movies', page_icon=':heavy_plus_sign:', layout='wide')
+st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='wide')
 
 df = load_data_with_cache()
 options = get_options(df)

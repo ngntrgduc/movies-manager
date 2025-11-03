@@ -1,7 +1,7 @@
 [project]
 name = "movie-manager"
 version = "0.1.3"
-description = "ngntrgduc's movies manager"
+description = "ngntrgduc's movie manager"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
