@@ -64,11 +64,25 @@ def update_movie(movie_id: int, updated_data: dict, cur: sqlite3.Cursor) -> None
         cur.execute("DELETE FROM movie_genre WHERE movie_id = ?", (movie_id,)) # remove old relations
         add_movie_genre(movie_id, genres, cur)
 
-def load_movies(con: sqlite3.Connection) -> pd.DataFrame:
-    """Load movies from the database, return as a pandas DataFrame."""
-    return pd.read_sql_query("SELECT * FROM movie_detail", con, index_col='id')
+def load_movies(con: sqlite3.Connection, with_index: bool = False) -> pd.DataFrame:
+    """
+    Load movies data from the database, return as a pandas DataFrame.
+    Parameters:
+        con (sqlite3.Connection): Active SQLite database connection.
+        with_index (bool, optional): 
+            If True, set the 'id' column as the DataFrame index. 
+            Defaults to False.
+    """
+    if with_index:
+        return pd.read_sql_query( "SELECT * FROM movie_detail", con, index_col='id')
+
+    return pd.read_sql_query("SELECT * FROM movie_detail", con)
 
 # For Power BI Dashboard
-def write_csv(df: pd.DataFrame) -> None:
-    """Write DataFrame data to csv file."""
-    df.to_csv('data/data.csv', index=False)
+# def update_csv(con: sqlite3.Connection) -> None:
+#     """Update CSV file with data from database."""
+#     df = load_movies(con, with_index=True)
+#     df.to_csv('data/data.csv', index=False)
+# def write_csv(df: pd.DataFrame) -> None:
+    # """Write DataFrame data to csv file."""
+    # df.to_csv('data/data.csv', index=False)
