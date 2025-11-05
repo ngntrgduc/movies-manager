@@ -1,16 +1,23 @@
 import click
+import sqlite3
 from rich import print
 
 DATA_FILE = 'data/data.csv'
 BACKUP_FILE = 'data/backup.csv'
+CON = sqlite3.connect('data/movies.db')
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
 # Therefore, we define a separate load_data function here without caching.
-def load_data():
+def load_data(with_index: bool = False):
     """Return data as a pandas DataFrame."""
-    import pandas as pd
-    return pd.read_csv(DATA_FILE, dtype={'note': 'string'})  
+    from utils.movie import load_movies
+    return load_movies(CON, with_index)
+
+def update_csv() -> None:
+    """Update CSV file with data from database."""
+    df = load_data(with_index=True)
+    df.to_csv('data/data.csv', index=False)
 
 def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str | None:
     """Resolve user input against choices with abbreviation and case-insensitive support."""
@@ -171,7 +178,6 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
 @cli.command()
 def add():
     """Add a new movie interactively."""
-    import pandas as pd
     from utils.cli import IntRangeOrNone
     from utils.date import get_current_year
 
@@ -238,7 +244,7 @@ def add():
 
     note = click.prompt('Note', **skippable_settings).strip()
 
-    new_record = {
+    new_movie = {
         'name': name,
         'year': year,
         'status': status,
@@ -250,10 +256,11 @@ def add():
         'note': note
     }
 
-    df = load_data()
-    new_row = pd.DataFrame([new_record]).astype(df.dtypes.to_dict())
-    new_df = pd.concat([df, new_row], ignore_index=True)
-    new_df.to_csv(DATA_FILE, index=False)
+    from utils.movie import add_movie
+    cur = CON.cursor()
+    add_movie(new_movie, cur)
+    CON.commit()
+    update_csv()
     print(f'Added {movie_type}: {name!r} ({year})')
 
 
@@ -296,4 +303,10 @@ def restore():
 
 
 if __name__ == '__main__':
-    cli()
+    try:
+        cli()
+    except Exception as e:
+        print(f'Exception: {e}')
+    finally:
+        CON.close()
+        # print('Closed connection.')
