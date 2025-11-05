@@ -4,8 +4,8 @@ archive
 *.ipynb
 
 test*
-*.sql
 devlog.md
 
 data.csv
 backup.csv
+*.db
