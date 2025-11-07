@@ -255,12 +255,14 @@ def add():
         'watched_date': watched_date,
         'note': note
     }
-
-    from utils.movie import add_movie
-    cur = CON.cursor()
-    add_movie(new_movie, cur)
-    CON.commit()
-    update_csv()
+    
+    from rich.status import Status
+    with Status(f'Adding...') as rich_status:
+        from utils.movie import add_movie
+        cur = CON.cursor()
+        add_movie(new_movie, cur)
+        CON.commit()
+        update_csv()
     print(f'Added {movie_type}: {name!r} ({year})')
 
 
