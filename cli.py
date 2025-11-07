@@ -269,8 +269,19 @@ def add():
 @cli.command()
 def stats():
     """Show statistics for the movie data."""
-    df = load_data()
-    print_stats(df)
+    total = CON.execute('SELECT COUNT(*) FROM movie').fetchone()[0]
+    print(f'Total: {total}')
+    for col in ['status', 'type', 'country']:
+        query = f"""
+            SELECT {col}, COUNT(*) as count 
+            FROM movie
+            GROUP BY {col}
+            ORDER BY count DESC
+        """
+        rows = CON.execute(query).fetchall()
+        print(col.capitalize())
+        for value, count in rows:
+            print(f' - {value}: {count}')
 
 @cli.command()
 def backup():
