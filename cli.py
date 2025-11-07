@@ -269,7 +269,8 @@ def add():
 @cli.command()
 def stats():
     """Show statistics for the movie data."""
-    total = CON.execute('SELECT COUNT(*) FROM movie').fetchone()[0]
+    cur = CON.cursor()
+    total = cur.execute('SELECT COUNT(*) FROM movie').fetchone()[0]
     print(f'Total: {total}')
     for col in ['status', 'type', 'country']:
         query = f"""
@@ -278,7 +279,7 @@ def stats():
             GROUP BY {col}
             ORDER BY count DESC
         """
-        rows = CON.execute(query).fetchall()
+        rows = cur.execute(query).fetchall()
         print(col.capitalize())
         for value, count in rows:
             print(f' - {value}: {count}')
