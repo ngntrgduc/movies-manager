@@ -1,5 +1,4 @@
 import sqlite3
-import pandas as pd
 
 def get_genre_id(name: str, cur: sqlite3.Cursor) -> int:
     """Get genre id by name."""
@@ -22,6 +21,8 @@ def add_movie_genre(movie_id: int, genres: list[str], cur: sqlite3.Cursor) -> No
 
 def add_movie(movie: dict, cur: sqlite3.Cursor) -> None:
     """Add a movie to the database."""
+    import pandas as pd
+
     # Handle manually to avoid inserting NaN (pandas), SQLite doesn't understand NaN
     cur.execute("""
         INSERT INTO movie (name, year, status, type, country, rating, watched_date, note)
@@ -64,7 +65,7 @@ def update_movie(movie_id: int, updated_data: dict, cur: sqlite3.Cursor) -> None
         cur.execute("DELETE FROM movie_genre WHERE movie_id = ?", (movie_id,)) # remove old relations
         add_movie_genre(movie_id, genres, cur)
 
-def load_movies(con: sqlite3.Connection, with_index: bool = False) -> pd.DataFrame:
+def load_movies(con: sqlite3.Connection, with_index: bool = False):
     """
     Load movies data from the database, return as a pandas DataFrame.
     Parameters:
@@ -73,6 +74,8 @@ def load_movies(con: sqlite3.Connection, with_index: bool = False) -> pd.DataFra
             If True, set the 'id' column as the DataFrame index. 
             Defaults to False.
     """
+    import pandas as pd
+
     if with_index:
         return pd.read_sql_query( "SELECT * FROM movie_detail", con, index_col='id')
 
