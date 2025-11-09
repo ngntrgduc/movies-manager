@@ -81,6 +81,11 @@ def load_movies(con: sqlite3.Connection, with_index: bool = False):
 
     return pd.read_sql_query("SELECT * FROM movie_detail", con)
 
+def get_movie(movie_id: int, cur: sqlite3.Cursor) -> tuple | None:
+    """Get movie information by id. Return a tuple or None if not found."""
+    cur.execute('SELECT * FROM movie_detail WHERE id = ?', (movie_id,))
+    return cur.fetchone()
+
 # For Power BI Dashboard
 # def update_csv(con: sqlite3.Connection) -> None:
 #     """Update CSV file with data from database."""

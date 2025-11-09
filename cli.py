@@ -265,6 +265,34 @@ def add():
         update_csv()
     print(f'Added {movie_type}: {name!r} ({year})')
 
+@cli.command()
+@click.argument('movie_id', type=int)
+def delete(movie_id: int):
+    """Delete a movie by id."""
+    from utils.movie import get_movie, delete_movie
+
+    # sqlite3.Row is very optimized (C-level), acts as a Mapping object, 
+    # so we can directly use dict() on it instead of dictionary comprehension
+    CON.row_factory = sqlite3.Row
+    cur = CON.cursor()
+
+    # Sacrifice formatting for speed by using a tuple instead of a pandas DataFrame
+    # Importing pandas is costly compared to sqlite
+    movie = get_movie(movie_id, cur)
+    if movie is None:
+        print(f'Movie with id {movie_id} not found.')
+        return
+
+    movie = dict(movie)
+    print(movie)
+
+    if click.confirm(f'Do you want to delete this {movie['type']}?', default=True):
+        delete_movie(movie_id, cur)
+        CON.commit()
+        update_csv()
+        print('Deleted successfully.')
+    else:
+        print('Deletion cancelled.')
 
 @cli.command()
 def stats():
