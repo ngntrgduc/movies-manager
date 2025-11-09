@@ -19,29 +19,13 @@ def update_csv() -> None:
     df = load_data(with_index=True)
     df.to_csv('data/data.csv', index=False)
 
-def resolve_choice(value: str, choices: list[str], strict: bool = False) -> str | None:
-    """Resolve user input against choices with abbreviation and case-insensitive support."""
-    lookup = {c[0].lower(): c for c in choices}     # abbreviation
-    lookup.update({c.lower(): c for c in choices})  # lowercase
-
-    value = value.strip().lower()
-    if value in lookup:
-        return lookup[value]
-    
-    if strict:
-        raise ValueError(
-            # Click-like error message
-            f"{value!r} is not one of {', '.join(repr(c) for c in choices)} or their initials."
-        )
-
-    return None
-
 def apply_filters(
         df, name=None, year=None, status=None, movie_type=None, 
         country=None, genres=None, rating=None, watched_year=None
 ):
     """Apply filters to the movie DataFrame."""
     import pandas as pd
+    from utils.cli import resolve_choice
 
     def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
         """Return a boolean mask for rows where the series matches a resolved choice."""
@@ -120,25 +104,7 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
         print('No filters specified. Use --help to see available options.')
         return
 
-    import pandas as pd
-
-    def print_df(df: pd.DataFrame) -> None:
-        """Display a DataFrame as a rich table."""
-        from rich.console import Console
-        from rich.table import Table
-
-        # Remove empty columns (e.g., rating, watched_date for 'waiting' status)
-        df = df.dropna(axis=1, how='all')
-
-        table = Table(show_header=True, header_style='bold blue')
-        for column in df.columns:
-            table.add_column(column)
-
-        for _, row in df.iterrows():
-            table.add_row(*[str(x) if pd.notna(x) else '' for x in row])
-
-        console = Console()
-        console.print(table)
+    from utils.cli import resolve_choice, print_df
 
     df = load_data()
     # For table displaying purpose
@@ -178,7 +144,7 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
 @cli.command()
 def add():
     """Add a new movie interactively."""
-    from utils.cli import IntRangeOrNone
+    from utils.cli import IntRangeOrNone, AbbrevChoice, valid_date
     from utils.date import get_current_year
 
     def format_genres(genres: str) -> str:
@@ -186,20 +152,6 @@ def add():
         return ','.join(
             genre for genre in (g.strip() for g in genres.split(',')) if genre
         )
-
-    class AbbrevChoice(click.Choice):
-        """Choice type with abbreviation, case-insensitive matching."""
-        def __init__(self, choices):
-            super().__init__(choices)
-        
-        def convert(self, value, param, ctx):
-            if isinstance(value, str) and value.strip() == '':
-                return ''
-
-            try:
-                return resolve_choice(value, self.choices, strict=True)
-            except ValueError as e:
-                self.fail(str(e), param, ctx)
 
     skippable_settings = {'default': '', 'show_default': False}
 
@@ -220,26 +172,7 @@ def add():
         rating = None
         watched_date = ''
     else:
-        rating = click.prompt(
-            'Rating', type=IntRangeOrNone(1, 10, clamp=True), **skippable_settings
-        )
-        
-        def valid_date(date: str) -> str:
-            from datetime import datetime
-            if date.strip() == '':
-                return ''
-
-            formats = ['%Y', '%Y-%m', '%Y-%m-%d']
-            for format in formats:
-                try:
-                    return datetime.strptime(date, format).strftime(format)
-                except ValueError:
-                    continue
-
-            raise click.BadParameter(
-                f"{date!r} does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
-            )
-
+        rating = click.prompt('Rating', type=IntRangeOrNone(1, 10, clamp=True), **skippable_settings)
         watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
 
     note = click.prompt('Note', **skippable_settings).strip()
