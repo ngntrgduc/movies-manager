@@ -21,7 +21,6 @@ def add_movie_genre(movie_id: int, genres: list[str], cur: sqlite3.Cursor) -> No
 
 def add_movie(movie: dict, cur: sqlite3.Cursor) -> None:
     """Add a movie to the database."""
-    import pandas as pd
 
     # Handle manually to avoid inserting NaN (pandas), SQLite doesn't understand NaN
     cur.execute("""
@@ -29,11 +28,11 @@ def add_movie(movie: dict, cur: sqlite3.Cursor) -> None:
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         movie['name'],
-        int(movie['year']) if not pd.isna(movie['year']) else None,
+        int(movie['year']) if movie['year'] is not None else None,
         movie['status'],
         movie['type'],
         movie['country'],
-        float(movie['rating']) if not pd.isna(movie['rating']) else None,
+        float(movie['rating']) if movie['rating'] is not None else None,
         movie['watched_date'],
         movie['note']
     ))

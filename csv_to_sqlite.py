@@ -3,14 +3,19 @@ import pandas as pd
 from utils.movie import add_movie
 from time import perf_counter
 
+tic = perf_counter()
 def csv_to_sqlite(df: pd.DataFrame, con: sqlite3.Connection) -> None:
     """Export csv data to SQLite database."""
     cur = con.cursor()
     for _, movie in df.iterrows():
-        add_movie(movie, cur)
+        movie_dict = dict(movie)
+        # Convert pandas NaN to None for SQLite
+        # When reading CSV with pandas, numeric columns with missing values become NaN.
+        # SQLite does not understand NaN, so we convert them to None which maps to NULL in SQLite.
+        movie_dict['year'] = int(movie['year']) if not pd.isna(movie['year']) else None
+        movie_dict['rating'] = float(movie['rating']) if not pd.isna(movie['rating']) else None
+        add_movie(movie_dict, cur)
 
-
-tic = perf_counter()
 con = sqlite3.connect("data/movies.db")
 cur = con.cursor()
 with open('sql/schema.sql', 'r') as f:
