@@ -60,7 +60,7 @@ class AbbrevChoice(click.Choice):
 
     def convert(self, value, param, ctx):
         if isinstance(value, str) and value.strip() == '':
-            return ''
+            return None
 
         try:
             return resolve_choice(value, self.choices, strict=True)

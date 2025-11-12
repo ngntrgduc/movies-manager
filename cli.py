@@ -170,12 +170,16 @@ def add():
 
     if status == 'waiting':
         rating = None
-        watched_date = ''
+        watched_date = None
     else:
         rating = click.prompt('Rating', type=IntRangeOrNone(1, 10, clamp=True), **skippable_settings)
         watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
+        if not watched_date:
+            watched_date = None
 
     note = click.prompt('Note', **skippable_settings).strip()
+    if not note:
+        note = None
 
     new_movie = {
         'name': name,
@@ -188,7 +192,8 @@ def add():
         'watched_date': watched_date,
         'note': note
     }
-    
+    print(new_movie)
+
     from rich.status import Status
     with Status(f'Adding...') as rich_status:
         from utils.movie import add_movie
