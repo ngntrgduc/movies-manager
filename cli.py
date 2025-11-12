@@ -140,6 +140,21 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
     else:
         print('No data.')
 
+@cli.command()
+@click.argument('movie_id', type=int)
+def get(movie_id: int):
+    """Get information of a movie by id."""
+    from utils.movie import get_movie
+
+    CON.row_factory = sqlite3.Row  # for dictionary conversion
+    cur = CON.cursor()
+
+    movie = get_movie(movie_id, cur)
+    if movie is None:
+        print(f'Movie with id {movie_id} not found.')
+        return
+
+    print(dict(movie))
 
 @cli.command()
 def add():
@@ -209,9 +224,7 @@ def delete(movie_id: int):
     """Delete a movie by id."""
     from utils.movie import get_movie, delete_movie
 
-    # sqlite3.Row is very optimized (C-level), acts as a Mapping object, 
-    # so we can directly use dict() on it instead of dictionary comprehension
-    CON.row_factory = sqlite3.Row
+    CON.row_factory = sqlite3.Row  # for dictionary conversion
     cur = CON.cursor()
 
     # Sacrifice formatting for speed by using a tuple instead of a pandas DataFrame
