@@ -175,6 +175,33 @@ def add():
 
 @cli.command()
 @click.argument('movie_id', type=int)
+def update(movie_id: int):
+    """Update a movie interactively by id."""
+    from utils.movie import get_movie, update_movie
+    from utils.movie_input import prompt_update_movie
+
+    CON.row_factory = sqlite3.Row
+    cur = CON.cursor()
+
+    existing_movie = get_movie(movie_id, cur)
+    if existing_movie is None:
+        print(f'Movie with id {movie_id} not found.')
+        return
+
+    existing_movie = dict(existing_movie)
+    print(existing_movie)
+    existing_movie.pop('id')
+
+    updated_data = prompt_update_movie(existing_movie)
+    print(updated_data)
+
+    update_movie(movie_id, updated_data, cur)
+    CON.commit()
+    update_csv()
+    print('Updated successfully.')
+
+@cli.command()
+@click.argument('movie_id', type=int)
 def delete(movie_id: int):
     """Delete a movie by id."""
     from utils.movie import get_movie, delete_movie

@@ -50,3 +50,53 @@ def prompt_add_movie() -> dict:
         'watched_date': watched_date,
         'note': note
     }
+
+def prompt_update_movie(existing_movie: dict) -> dict:
+    """Prompt the user interactively for fields to update, return only changed fields."""
+
+    def default_setting(default_value: str | int | float | None) -> dict:
+        return {'default': default_value, 'show_default': False}
+
+    movie = {}
+
+    movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
+    movie['year'] = click.prompt(
+        'Year', type=IntRangeOrNone(1900, get_current_year()),
+        **default_setting(existing_movie['year'])
+    )
+    movie['status'] = click.prompt(
+        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']),
+        **default_setting(existing_movie['status'])
+    )
+    movie['type'] = click.prompt(
+        'Type', type=AbbrevChoice(['movie', 'series']), **default_setting(existing_movie['type'])
+    )
+    movie['country'] = click.prompt(
+        'Country', type=AbbrevChoice(
+            ['China', 'Japan', 'Korea', 'US']), **default_setting(existing_movie['country'])
+    )
+    movie['genres'] = click.prompt(
+        'Genres (comma-separated)', value_proc=format_genres,
+          **default_setting(existing_movie['genres'])
+    )
+
+    if movie['status'] == 'waiting':
+        movie['rating'] = None
+        movie['watched_date'] = None
+    else:
+        movie['rating'] = click.prompt(
+            'Rating', type=IntRangeOrNone(1, 10, clamp=True),
+            **default_setting(existing_movie['rating'])
+        )
+        watched_date = click.prompt(
+            'Watched date', value_proc=valid_date, **default_setting(existing_movie['watched_date'])
+        )
+        movie['watched_date'] = watched_date if watched_date else None
+
+    note = click.prompt('Note', **default_setting(existing_movie['note'])).strip()
+    movie['note'] = note if note else None
+
+    # Only include fields that have changed compared to the existing movie
+    updated_data = {field: value for field, value in movie.items()
+                    if value != existing_movie[field]}
+    return updated_data
