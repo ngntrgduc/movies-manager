@@ -276,6 +276,63 @@ def restore():
     except Exception as e:
         print(f'Restore failed: {e}')
 
+@cli.command()
+@click.argument('filename', type=str, required=False)
+@click.option('--note', help='Show notes', is_flag=True)
+def sql(filename, note):
+    """Run a SQL file from the 'sql/' folder."""
+    import pathlib
+
+    sql_folder = pathlib.Path('sql/')
+    def list_sql_files() -> list[str]:
+        """Return a list of all SQL files in the 'sql/' folder."""
+        excluded = ['schema.sql']
+        return [
+            f.stem for f in sql_folder.glob('*.sql')
+            if f.name not in excluded
+        ]
+
+    def print_sql_files(sql_files: list[str]) -> None:
+        """Print a list of available SQL files."""
+        from rich.columns import Columns
+        from rich.console import Console
+        console = Console(width=60)
+        console.print('[bold cyan]Available SQL files:[/bold cyan]')
+        colored_files = [f'[green]{name}[/green]' for name in sql_files]
+        console.print(Columns(colored_files, equal=True, expand=True))
+
+    sql_files = list_sql_files()
+    if not filename:
+        print_sql_files(sql_files)
+        return
+
+    sql_path = sql_folder / f'{filename}.sql'
+    if not sql_path.exists():
+        print(f"SQL file '{filename}.sql' not found.")
+        print_sql_files(sql_files)
+        return
+
+    import pandas as pd
+    from utils.cli import print_df
+
+    query = sql_path.read_text()
+    print(f'[dim]{query}[/dim]')
+    print()
+    df = pd.read_sql_query(query, CON)
+    if df.empty:
+        print('No data.')
+        return 
+
+    # Handle numeric format
+    for col in ['rating', 'year']:
+        if col in df.columns:
+            df[col] = df[col].astype('Int64')
+    
+    if not note and 'note' in df.columns:
+        df.drop('note', axis=1, inplace=True)
+
+    print_df(df)
+    print(f'Total: {df.shape[0]}')
 
 if __name__ == '__main__':
     try:
