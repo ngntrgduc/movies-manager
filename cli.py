@@ -2,9 +2,9 @@ import click
 import sqlite3
 from rich import print
 
-DATA_FILE = 'data/data.csv'
-BACKUP_FILE = 'data/backup.csv'
-CON = sqlite3.connect('data/movies.db')
+BACKUP_FILE = 'data/backup.db'
+DB_FILE = 'data/movies.db'
+CON = sqlite3.connect(DB_FILE)
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
@@ -248,9 +248,9 @@ def stats():
 @cli.command()
 def backup():
     """Back up data."""
-    import shutil
     try:
-        shutil.copyfile(DATA_FILE, BACKUP_FILE)
+        with sqlite3.connect(BACKUP_FILE) as backup_con:
+            CON.backup(backup_con)
         print('Backup successful.')
     except Exception as e:
         print(f'Backup failed: {e}')
@@ -266,12 +266,11 @@ def restore():
         return
 
     click.confirm(
-        f'This will replace your current movie data with the backup file. Continue?',
-        abort=True
+        'This will replace your current movie database with the backup file. Continue?', abort=True
     )
 
     try:
-        shutil.copyfile(BACKUP_FILE, DATA_FILE)
+        shutil.copyfile(BACKUP_FILE, DB_FILE)
         print('Restore successful.')
     except Exception as e:
         print(f'Restore failed: {e}')
