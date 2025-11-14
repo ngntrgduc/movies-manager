@@ -58,7 +58,7 @@ def prompt_update_movie(existing_movie: dict) -> dict:
         return {'default': default_value, 'show_default': False}
 
     movie = {}
-
+    print('Press Enter to keep old value')
     movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
     movie['year'] = click.prompt(
         'Year', type=IntRangeOrNone(1900, get_current_year()),
