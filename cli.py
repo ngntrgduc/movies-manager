@@ -271,6 +271,7 @@ def restore():
 
     try:
         shutil.copyfile(BACKUP_FILE, DB_FILE)
+        update_csv()
         print('Restore successful.')
     except Exception as e:
         print(f'Restore failed: {e}')
