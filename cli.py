@@ -19,61 +19,6 @@ def update_csv() -> None:
     df = load_data(with_index=True)
     df.to_csv('data/data.csv', index=False)
 
-def apply_filters(
-        df, name=None, year=None, status=None, movie_type=None, 
-        country=None, genres=None, rating=None, watched_year=None
-):
-    """Apply filters to the movie DataFrame."""
-    import pandas as pd
-    from utils.cli import resolve_choice
-
-    def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
-        """Return a boolean mask for rows where the series matches a resolved choice."""
-        resolved = resolve_choice(value, choices)
-        if resolved:
-            return series == resolved
-        
-        return pd.Series(False, index=series.index)
-
-    mask = pd.Series(True, index=df.index)
-    if name:
-        mask &= df['name'].str.contains(name, case=False, na=False)
-    if year:
-        mask &= df['year'] == year
-    if watched_year:
-        mask &= df['watched_date'].str[:4].str.endswith(watched_year)
-    if status:
-        mask &= filter_by_choice(df['status'], status, ['waiting', 'completed', 'dropped'])
-    if movie_type:
-        mask &= filter_by_choice(df['type'], movie_type, ['movie', 'series'])
-    if country:
-        mask &= filter_by_choice(df['country'], country, ['China', 'Japan', 'Korea', 'US'])
-    if genres:
-        genres = [genre.strip() for genre in genres.split(',')]
-        genres_set = (
-            df['genres'].fillna('') .apply(lambda x: {g.strip() for g in x.split(',') if g.strip()})
-        )
-        mask &= genres_set.apply(lambda g: set(genres).issubset(g))
-    if rating:
-        mask &= df['rating'] == rating
-
-    return df[mask]
-
-def print_stats(df, excluded: list = [], print_total: bool = True) -> None:
-    """Print DataFrame statistics."""
-    def print_value_counts(name: str, series) -> None:
-        print(name)
-        value_counts = series.value_counts()
-        for value, count in value_counts.items():
-            if count:
-                print(f' - {value}: {count}')
-
-    if print_total:
-        print(f'Total: {df.shape[0]}')
-    for col in ['status', 'type', 'country']:
-        if col not in excluded:
-            print_value_counts(col.capitalize(), df[col])
-
 # changes the default parameters to -h and --help instead of just --help
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS, no_args_is_help=True)
@@ -104,7 +49,7 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
         print('No filters specified. Use --help to see available options.')
         return
 
-    from utils.cli import resolve_choice, print_df
+    from utils.cli import resolve_choice, apply_filters
 
     df = load_data()
     # For table displaying purpose
@@ -126,19 +71,28 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
         except ValueError as e:
             raise click.BadParameter(str(e))
 
-    if not filtered_df.empty:
-        print_df(filtered_df)
-        print(f'Total: {filtered_df.shape[0]}')
-        if stats:
-            option_to_col = {
-                'status': status,
-                'type': movie_type,
-                'country': country,
-            }
-            excluded = [col for col, val in option_to_col.items() if val]
-            print_stats(filtered_df, excluded, print_total=False)
-    else:
+    if filtered_df.empty:
         print('No data.')
+        return
+
+    from utils.cli import print_df
+    
+    def print_stats(df, excluded: list = []) -> None:
+        """Print DataFrame statistics."""
+        for col in ['status', 'type', 'country']:
+            if col in excluded:
+                continue
+
+            print(col.capitalize())
+            for value, count in df[col].value_counts().items():
+                print(f' - {value}: {count}')
+
+    print_df(filtered_df)
+    print(f'Total: {filtered_df.shape[0]}')
+    if stats:
+        option_to_col = {'status': status, 'type': movie_type, 'country': country}
+        excluded = [col for col, val in option_to_col.items() if val]
+        print_stats(filtered_df, excluded)
 
 @cli.command()
 @click.argument('movie_id', type=int)

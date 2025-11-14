@@ -103,3 +103,43 @@ def print_df(df) -> None:
 
     console = Console()
     console.print(table)
+
+def apply_filters(
+    df, name=None, year=None, status=None, movie_type=None, 
+    country=None, genres=None, rating=None, watched_year=None
+):
+    """Apply filters to the movie DataFrame."""
+    import pandas as pd
+    # from utils.cli import resolve_choice
+
+    def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
+        """Return a boolean mask for rows where the series matches a resolved choice."""
+        resolved = resolve_choice(value, choices)
+        if resolved:
+            return series == resolved
+        
+        return pd.Series(False, index=series.index)
+
+    mask = pd.Series(True, index=df.index)
+    if name:
+        mask &= df['name'].str.contains(name, case=False, na=False)
+    if year:
+        mask &= df['year'] == year
+    if watched_year:
+        mask &= df['watched_date'].str[:4].str.endswith(watched_year)
+    if status:
+        mask &= filter_by_choice(df['status'], status, ['waiting', 'completed', 'dropped'])
+    if movie_type:
+        mask &= filter_by_choice(df['type'], movie_type, ['movie', 'series'])
+    if country:
+        mask &= filter_by_choice(df['country'], country, ['China', 'Japan', 'Korea', 'US'])
+    if genres:
+        genres = [genre.strip() for genre in genres.split(',')]
+        genres_set = (
+            df['genres'].fillna('') .apply(lambda x: {g.strip() for g in x.split(',') if g.strip()})
+        )
+        mask &= genres_set.apply(lambda g: set(genres).issubset(g))
+    if rating:
+        mask &= df['rating'] == rating
+
+    return df[mask]
