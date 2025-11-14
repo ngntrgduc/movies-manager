@@ -57,6 +57,11 @@ def prompt_update_movie(existing_movie: dict) -> dict:
     def default_setting(default_value: str | int | float | None) -> dict:
         return {'default': default_value, 'show_default': False}
 
+    # Handle None value to be compatible with click.prompt by convert it to empty string
+    for field, value in existing_movie.items():
+        if value is None:
+            existing_movie[field] = ''
+
     movie = {}
     print('Press Enter to keep old value')
     movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
@@ -95,6 +100,11 @@ def prompt_update_movie(existing_movie: dict) -> dict:
 
     note = click.prompt('Note', **default_setting(existing_movie['note'])).strip()
     movie['note'] = note if note else None
+
+    # Re-convert empty string to None for SQLite compatible and comparison with updated data
+    for field, value in existing_movie.items():
+        if value == '':
+            existing_movie[field] = None
 
     # Only include fields that have changed compared to the existing movie
     updated_data = {field: value for field, value in movie.items()
