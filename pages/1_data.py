@@ -10,7 +10,7 @@ options = get_options(df)
 
 # First bar
 seach_bar, year_bar, watched_year_bar, status_bar = st.columns(
-    [0.3, 0.2, 0.2, 0.3], vertical_alignment='center'
+    [1, 1, 1, 1], vertical_alignment='top'
 )
 name = seach_bar.text_input('Search movie')
 selected_year = year_bar.selectbox('Year', options=options['year'], index=None)
@@ -18,12 +18,13 @@ selected_watched_year = watched_year_bar.selectbox(
     'Watched year', options=options['watched_year'], index=None
 )
 selected_status = status_bar.segmented_control(
-    'Status', options=['waiting', 'completed', 'dropped'], selection_mode='single', 
-    # width='stretch'
+    'Status', options=['waiting', 'completed', 'dropped'], selection_mode='single', width='stretch'
 )
 
 # Second bar
-genre_bar, type_bar, country_bar = st.columns([0.5, 0.25, 0.25], vertical_alignment='center')
+genre_bar, type_bar, country_bar, container = st.columns(
+    [2, 1, 1, 1], vertical_alignment='bottom'
+)
 selected_genres = genre_bar.multiselect('Genres', options=options['genres'])
 selected_type = type_bar.selectbox('Type', options=options['type'], index=None)
 selected_country = country_bar.selectbox('Country', options=options['country'], index=None)
@@ -57,6 +58,8 @@ if selected_country:
     mask &= df['country'] == selected_country
 
 filtered_df = df[mask]
-st.dataframe(filtered_df, column_config=load_column_config(), hide_index=True)
-st.write(f'Total: **{filtered_df.shape[0]}**, \
+show_id = container.checkbox('Show id', value=True)
+container.write(f'Total: **{filtered_df.shape[0]}**, \
          Memory usage: **{filtered_df.memory_usage().sum() / 1024:.2f} KB**')
+
+st.dataframe(filtered_df, column_config=load_column_config(), hide_index=not show_id, height=320)
