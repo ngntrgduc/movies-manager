@@ -1,10 +1,11 @@
 import click
 import sqlite3
 from rich import print
+from utils.movie import get_connection
 
-BACKUP_FILE = 'data/backup.db'
 DB_FILE = 'data/movies.db'
-CON = sqlite3.connect(DB_FILE)
+BACKUP_FILE = 'data/backup.db'
+CON = get_connection(DB_FILE)
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
 # but the CLI does not run inside a Streamlit runtime. 
