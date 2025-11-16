@@ -2,7 +2,7 @@ import streamlit as st
 from utils.date import get_today, get_year
 from utils.movie import add_movie, get_connection, load_movies, get_countries
 
-st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='wide')
+st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='centered')
 
 # Use session state to clear user input instead of st.form, 
 # so that watch_date is auto-added when the status changes.
@@ -61,45 +61,40 @@ def add_to_db() -> None:
     st.toast(f'Added **{name}**.', icon='✅')
     reset_form()
 
-left_container, right_container = st.columns([0.5, 0.5], gap='medium')
+container = st.container(border=True)
+with container:
+    name_bar, year_bar, type_bar = st.columns([2, 1, 1])
+    name_bar.text_input('Name', max_chars=150, key='name')
+    year_bar.number_input(
+        'Year', min_value=1900, max_value=get_year(get_today()), value=None, step=1, key='year'
+    )
+    type_bar.selectbox('Type', options=['movie', 'series'], key='type')
 
-# Left container
-left_container.text_input('Name', max_chars=150, key='name')
+    country_bar, genres_bar = st.columns([1, 2])
+    
+    with get_connection() as con:
+        cur = con.cursor()
+        countries = get_countries(cur)
+    
+    country_bar.selectbox(
+        'Country', options=countries, placeholder='Choose or add option', 
+        accept_new_options=True, index=None, key='country'
+    )
+    genres_bar.text_input('Genres (separated by comma)', key='genres')
 
-year_bar, type_bar, country_bar = left_container.columns([1, 1, 1], vertical_alignment='bottom')
-year_bar.number_input(
-    'Year', min_value=1900, max_value=get_year(get_today()), value=None, step=1, key='year'
-)
-type_bar.selectbox('Type', options=['movie', 'series'], key='type')
+    if 'status' not in st.session_state:
+        st.session_state['status'] = 'waiting'
 
-with get_connection() as con:
-    cur = con.cursor()
-    countries = get_countries(cur)
+    status_bar, watched_year_bar, rating_bar = st.columns([2, 1, 1], vertical_alignment='center')
+    status_bar.segmented_control(
+        'Status', ['waiting', 'completed' ,'dropped'], width='stretch',
+        key='status', on_change=update_watched_date
+    )
+    watched_year_bar.text_input('Watched date', value=None, placeholder='YYYY-MM-DD', key='watched_date')
+    rating_bar.number_input(
+        'Rating', min_value=1, max_value=10, value=None, step=1, placeholder='1-10', key='rating'
+    )
 
-country_bar.selectbox(
-    'Country', options=countries, placeholder='Choose or add option', 
-    # 'Country', options=options['country'], placeholder='Choose or add option', 
-    accept_new_options=True, index=None, key='country'
-)
+    st.text_area('Note', value=None, height='stretch', key='note')
 
-genres_bar, add_button = left_container.columns([2, 1], vertical_alignment='bottom')
-genres_bar.text_input('Genres (separated by comma)', key='genres')
-add_button.button('Add', type='primary', width='stretch', on_click=add_to_db)
-
-# Right container
-if 'status' not in st.session_state:
-    st.session_state['status'] = 'waiting'
-
-status_bar, watched_year_bar, rating_bar = right_container.columns(
-    [1.2, 0.8, 0.6], vertical_alignment='center'
-)
-status_bar.segmented_control(
-    'Status', ['waiting', 'completed' ,'dropped'], width='stretch',
-    key='status', on_change=update_watched_date
-)
-watched_year_bar.text_input('Watched date', value=None, placeholder='YYYY-MM-DD', key='watched_date')
-rating_bar.number_input(
-    'Rating', min_value=1, max_value=10, value=None, step=1, placeholder='1-10', key='rating'
-)
-
-right_container.text_area('Note', value=None, height='stretch', key='note')
+    st.button('Add', type='primary', width='stretch', on_click=add_to_db)
