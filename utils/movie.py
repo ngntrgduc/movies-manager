@@ -93,11 +93,8 @@ def get_movie(movie_id: int, cur: sqlite3.Cursor) -> tuple | None:
     cur.execute('SELECT * FROM movie_detail WHERE id = ?', (movie_id,))
     return cur.fetchone()
 
-# For Power BI Dashboard
-# def update_csv(con: sqlite3.Connection) -> None:
-#     """Update CSV file with data from database."""
-#     df = load_movies(con, with_index=True)
-#     df.to_csv('data/data.csv', index=False)
-# def write_csv(df: pd.DataFrame) -> None:
-    # """Write DataFrame data to csv file."""
-    # df.to_csv('data/data.csv', index=False)
+def get_countries(cur: sqlite3.Cursor) -> list[str]:
+    """Return a list of all countries in the database using SQL."""
+    cur.execute('SELECT DISTINCT country FROM movie ORDER BY country')
+    countries = cur.fetchall()
+    return [country for (country,) in countries if country is not None]
