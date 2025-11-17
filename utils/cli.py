@@ -110,7 +110,6 @@ def apply_filters(
 ):
     """Apply filters to the movie DataFrame."""
     import pandas as pd
-    # from utils.cli import resolve_choice
 
     def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
         """Return a boolean mask for rows where the series matches a resolved choice."""
@@ -134,12 +133,31 @@ def apply_filters(
     if country:
         mask &= filter_by_choice(df['country'], country, ['China', 'Japan', 'Korea', 'US'])
     if genres:
-        genres = [genre.strip() for genre in genres.split(',')]
+        genres = [genre for g in genres.split(',') if (genre := g.strip())]
         genres_set = (
-            df['genres'].fillna('') .apply(lambda x: {g.strip() for g in x.split(',') if g.strip()})
+            df['genres'].fillna('').apply(
+                lambda x: {genre for g in x.split(',') if (genre := g.strip())}
+            )
         )
-        mask &= genres_set.apply(lambda g: set(genres).issubset(g))
+        set_mask = genres_set.apply(lambda g: set(genres).issubset(g))
+        if set_mask.any():
+            mask &= set_mask
+        else:
+            # Fallback fuzzy matching using substring search
+            def fuzzy_match(row: str) -> bool:
+                row_genres = [genre for g in row.split(',') if (genre := g.strip())]
+                return all(
+                    any(search_genre in genre for genre in row_genres)
+                    for search_genre in genres
+                )
+
+            fuzzy_mask = df['genres'].fillna('').apply(fuzzy_match)
+            mask &= fuzzy_mask
     if rating:
         mask &= df['rating'] == rating
+
+    # prevent showing all rows after filtering
+    if mask.all():
+        mask[:] = False
 
     return df[mask]
