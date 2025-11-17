@@ -12,7 +12,7 @@
 
 Recommendation threshold: > **8**
 
-**Why a 10-point scale?**: It simplifies input (reduces cognitive load), aligns with common standards like IMDb, and reflects that a 10-point scale is simply a 5-point scale with half-point increments.
+**Why a 10-point scale?**: It simplifies input (reduces cognitive load), aligns with common standards like IMDb, and reflects that a 10-point scale is simply a 5-point scale with half-point increments ([Letterboxd](https://letterboxd.com/) use this).
 
 
 ### Criteria for selecting movies/series
