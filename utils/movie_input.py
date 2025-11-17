@@ -1,0 +1,112 @@
+import click
+from utils.cli import IntRangeOrNone, AbbrevChoice, valid_date
+from utils.date import get_current_year
+
+def format_genres(genres: str) -> str:
+    """Normalize comma-separated genres by stripping whitespace and removing empties."""
+    return ','.join(
+        genre for genre in (g.strip() for g in genres.split(',')) if genre
+    )
+
+def prompt_add_movie() -> dict:
+    """Prompt the user interactively to add a new movie and return the data as a dictionary."""
+
+    skippable_settings = {'default': '', 'show_default': False}
+
+    name = click.prompt('Name').strip()
+    year = click.prompt(
+        'Year', type=IntRangeOrNone(1900, get_current_year()), **skippable_settings
+    )
+    status = click.prompt(
+        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']), default='waiting'
+    )
+    movie_type = click.prompt('Type', type=AbbrevChoice(['movie', 'series']))
+    country = click.prompt(
+        'Country', type=AbbrevChoice(['China', 'Japan', 'Korea', 'US']), **skippable_settings
+    )
+    genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
+
+    if status == 'waiting':
+        rating = None
+        watched_date = None
+    else:
+        rating = click.prompt('Rating', type=IntRangeOrNone(1, 10, clamp=True), **skippable_settings)
+        watched_date = click.prompt('Watched date', value_proc=valid_date, **skippable_settings)
+        if not watched_date:
+            watched_date = None
+
+    note = click.prompt('Note', **skippable_settings).strip()
+    if not note:
+        note = None
+
+    return {
+        'name': name,
+        'year': year,
+        'status': status,
+        'type': movie_type,
+        'country': country,
+        'genres': genres,
+        'rating': rating,
+        'watched_date': watched_date,
+        'note': note
+    }
+
+def prompt_update_movie(existing_movie: dict) -> dict:
+    """Prompt the user interactively for fields to update, return only changed fields."""
+
+    def default_setting(default_value: str | int | float | None) -> dict:
+        return {'default': default_value, 'show_default': False}
+
+    # Handle None value to be compatible with click.prompt by convert it to empty string
+    for field, value in existing_movie.items():
+        if value is None:
+            existing_movie[field] = ''
+
+    movie = {}
+    print('Press Enter to keep old value')
+    movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
+    movie['year'] = click.prompt(
+        'Year', type=IntRangeOrNone(1900, get_current_year()),
+        **default_setting(existing_movie['year'])
+    )
+    movie['status'] = click.prompt(
+        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']),
+        **default_setting(existing_movie['status'])
+    )
+    movie['type'] = click.prompt(
+        'Type', type=AbbrevChoice(['movie', 'series']), **default_setting(existing_movie['type'])
+    )
+    movie['country'] = click.prompt(
+        'Country', type=AbbrevChoice(
+            ['China', 'Japan', 'Korea', 'US']), **default_setting(existing_movie['country'])
+    )
+    movie['genres'] = click.prompt(
+        'Genres (comma-separated)', value_proc=format_genres,
+          **default_setting(existing_movie['genres'])
+    )
+
+    if movie['status'] == 'waiting':
+        movie['rating'] = None
+        movie['watched_date'] = None
+    else:
+        movie['rating'] = click.prompt(
+            'Rating', type=IntRangeOrNone(1, 10, clamp=True),
+            **default_setting(existing_movie['rating'])
+        )
+        watched_date = click.prompt(
+            'Watched date', value_proc=valid_date, **default_setting(existing_movie['watched_date'])
+        )
+        movie['watched_date'] = watched_date if watched_date else None
+
+    note = click.prompt('Note', **default_setting(existing_movie['note'])).strip()
+    movie['note'] = note if note else None
+
+    # Re-convert empty string to None for SQLite compatible and comparison with updated data
+    for field, value in existing_movie.items():
+        if value == '':
+            existing_movie[field] = None
+
+    # Only include fields that have changed compared to the existing movie
+    updated_data = {field: value for field, value in movie.items()
+                    if value != existing_movie[field]}
+    return updated_data

@@ -17,6 +17,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
  -->
+## [[v0.2.0](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.2.0)]
+
+Moving data to SQLite database.
+
+### Added
+- Script to move data from CSV to SQLite: `csv_to_sqlite.py`
+- `timing` decorator in `utils/` to benchmark functions speed
+- Movie sqlite database and backup
+
+CLI:
+- Sorting by `year`
+- `delete`, `get`, `update` command
+- `sql` command to run SQL script, provide flexibility and customization
+- Show last modified of backup file in `restore` command
+- Genres fuzzy matching in `filter` command
+
+### Changed
+- `load_data` function use index
+- Hangle None values in `add_movie` manually instead of using pandas
+- Layout of Add page
+- Add `Refresh` button for Data and Edit pages
+- Rename Add page and Edit page file name for ordering purpose
+
+CLI:
+- `add` command use SQL to add movie to the SQLite database
+- `stats` command use SQL for faster runtime
+- `backup` use sqlite3.backup instead of shutil, restore to `backup.db`
+- `restore` from `backup.db` instead of `backup.csv`
+
+
 ## [[v0.1.3](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.1.3)]
 
 ### Added

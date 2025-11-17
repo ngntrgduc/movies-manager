@@ -1,22 +1,15 @@
 import streamlit as st
 import pandas as pd
 
-from .date import get_year
-
 @st.cache_data
 def load_data_with_cache() -> pd.DataFrame:
-    # return pd.read_csv('data.csv')
-    return pd.read_csv(
-        'data/data.csv', 
-        dtype={'note': 'string'}  # in case all movies in data don't have note
-    )  
-
-def write_data(df: pd.DataFrame) -> None:
-    # df.to_csv('data.csv', index=False)
-    df.to_csv('data/data.csv', index=False)
+    from utils.movie import load_movies, get_connection
+    with get_connection() as con:
+        return load_movies(con, with_index=True)
 
 @st.cache_data
 def get_options(df: pd.DataFrame) -> dict:
+    from .date import get_year
     return {
             'year': sorted(df['year'].dropna().astype(int).unique().tolist(), reverse=True),
             # 'status': ['waiting', 'completed' ,'dropped'],
@@ -42,6 +35,7 @@ def get_options(df: pd.DataFrame) -> dict:
 def load_column_config() -> dict:
     """Load column config for Streamlit dataframe and data editor"""
     return {
+        'id': st.column_config.NumberColumn(disabled=True),
         'name': st.column_config.TextColumn(pinned=True, width='medium', required=True),
         'year': st.column_config.NumberColumn(width=8, required=True),
         'status': st.column_config.SelectboxColumn(
