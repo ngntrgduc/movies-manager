@@ -8,4 +8,7 @@ devlog.md
 
 data.csv
 backup.csv
+
+format.py
 *.db
+remove_note.py
