@@ -1,10 +1,11 @@
 import click
 import sqlite3
 from rich import print
+from pathlib import Path
 from utils.movie import get_connection
 
-DB_FILE = 'data/movies.db'
-BACKUP_FILE = 'data/backup.db'
+DB_FILE = Path('data/movies.db')
+BACKUP_FILE = Path('data/backup.db')
 CON = get_connection(DB_FILE)
 
 # The @st.cache_data decorator in utils.data is intended for Streamlit apps,
@@ -213,10 +214,9 @@ def backup():
 @cli.command()
 def restore():
     """Restore data from backup."""
-    from pathlib import Path
     import shutil
 
-    if not Path(BACKUP_FILE).exists():
+    if not BACKUP_FILE.exists():
         print("Backup file not found. Run 'backup' first.")
         return
 
@@ -236,9 +236,8 @@ def restore():
 @click.option('--note', help='Show notes', is_flag=True)
 def sql(filename, note):
     """Run a SQL file from the 'sql/' folder."""
-    import pathlib
 
-    sql_folder = pathlib.Path('sql/')
+    sql_folder = Path('sql/')
     def list_sql_files() -> list[str]:
         """Return a list of all SQL files in the 'sql/' folder."""
         excluded = ['schema.sql']
