@@ -38,7 +38,7 @@ def cli():
 @click.option('-g', '--genres', help='Filter by genres (comma-separated)')
 @click.option('-r', '--rating', type=click.IntRange(1, 10, clamp=True), help='Filter by rating')
 @click.option('-w', '--watched-year', help='Filter by watched year')
-@click.option('--sort', help='Sort result by rating or watched date')
+@click.option('--sort', help='Sort result by year or rating or watched date')
 @click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
 @click.option('--note', help='Show notes', is_flag=True)
 def filter(name, year, status, movie_type, country, genres, rating, watched_year, sort, stats, note):
@@ -239,7 +239,8 @@ def restore():
 @cli.command()
 @click.argument('filename', type=str, required=False)
 @click.option('--note', help='Show notes', is_flag=True)
-def sql(filename, note):
+@click.option('--sort', help='Sort result by column', nargs=2)
+def sql(filename, note, sort):
     """Run a SQL file from the 'sql/' folder."""
 
     sql_folder = Path('sql/')
@@ -289,6 +290,24 @@ def sql(filename, note):
     
     if not note and 'note' in df.columns:
         df.drop('note', axis=1, inplace=True)
+
+    if sort:
+        from utils.cli import resolve_choice
+
+        column, order = sort
+        resolved = resolve_choice(column, list(df.columns))
+        if not resolved:
+            print(f"Column '{column}' not found. Skipping sort.\n")
+        else:
+            if order in ('asc', 'a'):
+                ascending = True
+            elif order in ('desc', 'd'):
+                ascending = False
+            else:
+                ascending = True  # default if invalid
+                print(f"Invalid sort order '{order}', using 'asc' by default.\n")
+
+            df = df.sort_values(by=[resolved], ascending=ascending)
 
     print_df(df)
     print(f'Total: {df.shape[0]}')
