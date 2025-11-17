@@ -9,8 +9,8 @@ df = load_data_with_cache()
 options = get_options(df)
 
 # First bar
-seach_bar, year_bar, watched_year_bar, status_bar = st.columns(
-    [1, 1, 1, 1], vertical_alignment='top'
+seach_bar, year_bar, watched_year_bar, status_bar, refresh_button = st.columns(
+    [1, 1, 1, 1, 0.3], vertical_alignment='bottom'
 )
 name = seach_bar.text_input('Search movie')
 selected_year = year_bar.selectbox('Year', options=options['year'], index=None)
@@ -20,6 +20,9 @@ selected_watched_year = watched_year_bar.selectbox(
 selected_status = status_bar.segmented_control(
     'Status', options=['waiting', 'completed', 'dropped'], selection_mode='single', width='stretch'
 )
+if refresh_button.button('Refresh', width='content'):
+    load_data_with_cache.clear()
+    st.rerun()
 
 # Second bar
 genre_bar, type_bar, country_bar, container = st.columns(
