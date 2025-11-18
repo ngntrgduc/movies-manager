@@ -311,9 +311,9 @@ def sql(filename, note, sort):
         if not fuzzy_match:
             print(f"Column '{column}' not found. Skipping sort.\n")
         else:
-            if order in ('asc', 'a'):
+            if order in ('asc', 'a', '+'):
                 ascending = True
-            elif order in ('desc', 'd'):
+            elif order in ('desc', 'd', '-'):
                 ascending = False
             else:
                 ascending = True  # default if invalid
