@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from utils.data import load_data_with_cache, load_column_config, get_options
+from utils.streamlit_helpers import load_data_with_cache, load_column_config, get_options
 from utils.format import format_genres
 
 st.set_page_config(page_title = 'Movie Manager', page_icon=':movie_camera:', layout='wide')

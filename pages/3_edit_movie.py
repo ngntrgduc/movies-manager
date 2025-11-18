@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.data import load_data_with_cache, load_column_config
+from utils.streamlit_helpers import load_data_with_cache, load_column_config
 from utils.movie import get_connection, load_movies, add_movie, update_movie, delete_movie
 
 st.set_page_config(page_title = 'Edit movies', page_icon=':pencil2:', layout='wide')
