@@ -2,23 +2,15 @@ import click
 import sqlite3
 from rich import print
 from pathlib import Path
-from utils.movie import get_connection
+from utils.movie import get_connection, load_movies
 
 DB_FILE = Path('data/movies.db')
 BACKUP_FILE = Path('data/backup.db')
 CON = get_connection(DB_FILE)
 
-# The @st.cache_data decorator in utils.data is intended for Streamlit apps,
-# but the CLI does not run inside a Streamlit runtime. 
-# Therefore, we define a separate load_data function here without caching.
-def load_data(with_index: bool = False):
-    """Return data as a pandas DataFrame."""
-    from utils.movie import load_movies
-    return load_movies(CON, with_index)
-
 def update_csv() -> None:
     """Update CSV file with data from database."""
-    df = load_data(with_index=True)
+    df = load_movies(CON, with_index=True)
     df.to_csv('data/data.csv', index=False)
 
 # changes the default parameters to -h and --help instead of just --help
@@ -53,7 +45,7 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
 
     from utils.cli import resolve_choice, apply_filters
 
-    df = load_data()
+    df = load_movies(CON, with_index=False)
     # For table displaying purpose
     df['year'] = df['year'].astype('Int64')
     df['rating'] = df['rating'].astype('Int64')
@@ -288,8 +280,6 @@ def sql(filename, note, sort):
                 return
 
         sql_path = sql_path.with_stem(matched_name)
-        # print(f'{sql_path = }')
-        # return
 
     import pandas as pd
     from utils.cli import print_df
