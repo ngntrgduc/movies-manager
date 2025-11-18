@@ -262,6 +262,8 @@ def sql(filename, note, sort):
         print_sql_files(sql_files)
         return
 
+    from difflib import get_close_matches
+    
     # If exact file doesn't exist -> attempt prefix match + fuzzy match
     sql_path = sql_folder / f'{filename}.sql'
     if not sql_path.exists():
@@ -274,7 +276,6 @@ def sql(filename, note, sort):
             print(f"Closest prefix match: '{matched_name}.sql'")
         else:
             # Fuzzy match
-            from difflib import get_close_matches
             fuzzy_match = get_close_matches(filename, sql_files, n=1)
             if fuzzy_match:
                 matched_name = fuzzy_match[0]
@@ -305,11 +306,9 @@ def sql(filename, note, sort):
         df.drop('note', axis=1, inplace=True)
 
     if sort:
-        from utils.cli import resolve_choice
-
         column, order = sort
-        resolved = resolve_choice(column, list(df.columns))
-        if not resolved:
+        fuzzy_match = get_close_matches(column, list(df.columns), n=1)
+        if not fuzzy_match:
             print(f"Column '{column}' not found. Skipping sort.\n")
         else:
             if order in ('asc', 'a'):
@@ -320,7 +319,8 @@ def sql(filename, note, sort):
                 ascending = True  # default if invalid
                 print(f"Invalid sort order '{order}', using 'asc' by default.\n")
 
-            df = df.sort_values(by=[resolved], ascending=ascending)
+            matched_column = fuzzy_match[0]
+            df = df.sort_values(by=[matched_column], ascending=ascending)
 
     print_df(df)
     print(f'Total: {df.shape[0]}')
