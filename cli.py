@@ -59,8 +59,12 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
     sort = sort.strip() if sort else None
     if sort:
         try: 
-            resolved = resolve_choice(sort, ['year', 'rating', 'watched_date'], strict=True)
-            ascending = (resolved == 'watched_date' or resolved == 'year')
+            descending_columns = ['rating']
+            excluded_columns = ['genres', 'note']
+            sortable_columns = [col for col in filtered_df.columns 
+                                if col not in excluded_columns]
+            resolved = resolve_choice(sort, sortable_columns, strict=True)
+            ascending = resolved not in descending_columns
             filtered_df = filtered_df.sort_values(by=[resolved], ascending=ascending)
         except ValueError as e:
             raise click.BadParameter(str(e))
