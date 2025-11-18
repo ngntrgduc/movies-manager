@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.date import get_today, get_year
 from utils.movie import add_movie, get_connection, load_movies, get_countries
+from utils.format import format_genres
 
 st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='centered')
 
@@ -41,9 +42,7 @@ def add_to_db() -> None:
         'status': st.session_state['status'],
         'type': st.session_state['type'],
         'country': st.session_state['country'],
-        'genres': ','.join(
-            genre for genre in (g.strip() for g in genres.split(',')) if genre
-        ),
+        'genres': format_genres(genres),
         'rating': st.session_state['rating'],
         'watched_date': st.session_state['watched_date'],
         'note': st.session_state['note'],

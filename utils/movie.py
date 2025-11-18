@@ -44,8 +44,7 @@ def add_movie(movie: dict, cur: sqlite3.Cursor) -> None:
     ))
 
     movie_id = cur.lastrowid
-    genres = [g.strip() for g in str(movie['genres']).split(',') if g.strip()]
-    add_movie_genre(movie_id, genres, cur)
+    add_movie_genre(movie_id, movie['genres'], cur)
 
 def delete_movie(movie_id: int, cur: sqlite3.Cursor) -> None:
     """Delete a movie by id."""
@@ -68,8 +67,6 @@ def update_movie(movie_id: int, updated_data: dict, cur: sqlite3.Cursor) -> None
     # update genres relationship
     if genres is not None:
         cur.execute("DELETE FROM movie_genre WHERE movie_id = ?", (movie_id,)) # remove old relations
-        # convert string to list of genres
-        genres = [genre for g in genres.split(',') if (genre := g.strip())]
         add_movie_genre(movie_id, genres, cur)
 
 def load_movies(con: sqlite3.Connection, with_index: bool = False):

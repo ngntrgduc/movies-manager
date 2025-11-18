@@ -133,19 +133,16 @@ def apply_filters(
     if country:
         mask &= filter_by_choice(df['country'], country, ['China', 'Japan', 'Korea', 'US'])
     if genres:
-        genres = [genre for g in genres.split(',') if (genre := g.strip())]
-        genres_set = (
-            df['genres'].fillna('').apply(
-                lambda x: {genre for g in x.split(',') if (genre := g.strip())}
-            )
-        )
+        from utils.format import format_genres
+        genres = format_genres(genres)
+        genres_set = df['genres'].fillna('').apply(lambda g: format_genres(g, as_set=True))
         set_mask = genres_set.apply(lambda g: set(genres).issubset(g))
         if set_mask.any():
             mask &= set_mask
         else:
             # Fallback fuzzy matching using substring search
             def fuzzy_match(row: str) -> bool:
-                row_genres = [genre for g in row.split(',') if (genre := g.strip())]
+                row_genres = format_genres(row)
                 return all(
                     any(search_genre in genre for genre in row_genres)
                     for search_genre in genres

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from utils.data import load_data_with_cache, load_column_config, get_options
+from utils.format import format_genres
 
 st.set_page_config(page_title = 'Movie Manager', page_icon=':movie_camera:', layout='wide')
 
@@ -47,11 +48,7 @@ if selected_status:
     mask &= df['status'] == selected_status
 
 if selected_genres:
-    genres_set = (
-        df['genres']
-        .fillna('')
-        .apply(lambda x: {g.strip() for g in x.split(',') if g.strip()})
-    )
+    genres_set = df['genres'].fillna('').apply(lambda g: format_genres(g, as_set=True))
     mask &= genres_set.apply(lambda g: set(selected_genres).issubset(g))
 
 if selected_type:

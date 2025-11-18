@@ -11,7 +11,7 @@ def get_default_values() -> dict:
         'status': 'waiting',
         'type': 'movie',
         'country': None,
-        'genres': '',
+        'genres': None,
         'rating': None,
         'watched_date': None,
         'note': None,
@@ -40,9 +40,6 @@ if container.button(
         
         # Add
         for movie in edited['added_rows']:
-            # Convert genres to string representation
-            movie['genres'] = ','.join(movie['genres'])
-
             new_movie = get_default_values()
             new_movie.update(movie)
             add_movie(new_movie, cur)
@@ -50,11 +47,6 @@ if container.button(
         # Update
         for row_number, updated_data in edited['edited_rows'].items():
             movie_id = int(df.index[row_number])
-
-            # Convert genres to string representation
-            if updated_data.get('genres', None): 
-                updated_data['genres'] = ','.join(updated_data['genres'])
-
             update_movie(movie_id, updated_data, cur)
 
         # Delete 

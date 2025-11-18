@@ -1,12 +1,7 @@
 import click
 from utils.cli import IntRangeOrNone, AbbrevChoice, valid_date
 from utils.date import get_current_year
-
-def format_genres(genres: str) -> str:
-    """Normalize comma-separated genres by stripping whitespace and removing empties."""
-    return ','.join(
-        genre for genre in (g.strip() for g in genres.split(',')) if genre
-    )
+from utils.format import format_genres
 
 def prompt_add_movie() -> dict:
     """Prompt the user interactively to add a new movie and return the data as a dictionary."""
