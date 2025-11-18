@@ -239,7 +239,7 @@ def restore():
 @cli.command()
 @click.argument('filename', type=str, required=False)
 @click.option('--note', help='Show notes', is_flag=True)
-@click.option('--sort', help='Sort result by column', nargs=2)
+@click.option('-s', '--sort', help='Sort result by column', nargs=2)
 def sql(filename, note, sort):
     """Run a SQL file from the 'sql/' folder."""
 
@@ -277,6 +277,7 @@ def sql(filename, note, sort):
             matched_name = prefix_matches[0]
             print(f"Closest prefix match: '{matched_name}.sql'")
         else:
+            # Fuzzy match
             from difflib import get_close_matches
             fuzzy_match = get_close_matches(filename, sql_files, n=1)
             if fuzzy_match:
