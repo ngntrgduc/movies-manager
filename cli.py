@@ -320,7 +320,11 @@ def sql(filename, note, sort):
                 print(f"Invalid sort order '{order}', using 'asc' by default.\n")
 
             matched_column = fuzzy_match[0]
-            df = df.sort_values(by=[matched_column], ascending=ascending)
+            if df[matched_column].astype(str).str.contains('%').any():
+                df = df.sort_values(by=[matched_column], ascending=ascending, 
+                                    key=lambda col: col.str.rstrip('%').astype(float))
+            else:
+                df = df.sort_values(by=[matched_column], ascending=ascending)
 
     print_df(df)
     print(f'Total: {df.shape[0]}')
