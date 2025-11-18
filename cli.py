@@ -266,17 +266,35 @@ def sql(filename, note, sort):
         print_sql_files(sql_files)
         return
 
+    # If exact file doesn't exist -> attempt prefix match + fuzzy match
     sql_path = sql_folder / f'{filename}.sql'
     if not sql_path.exists():
-        print(f"SQL file '{filename}.sql' not found.")
-        print_sql_files(sql_files)
-        return
+        print(f'SQL file {sql_path.name!r} not found.')
+
+        # Prefix match
+        prefix_matches = [name for name in sql_files if name.startswith(filename)]
+        if prefix_matches:
+            matched_name = prefix_matches[0]
+            print(f"Closest prefix match: '{matched_name}.sql'")
+        else:
+            from difflib import get_close_matches
+            fuzzy_match = get_close_matches(filename, sql_files, n=1)
+            if fuzzy_match:
+                matched_name = fuzzy_match[0]
+                print(f"Closest fuzzy match: '{matched_name}.sql'") 
+            else:
+                print(f"No similar SQL files found in '{sql_folder}/'")
+                return
+
+        sql_path = sql_path.with_stem(matched_name)
+        # print(f'{sql_path = }')
+        # return
 
     import pandas as pd
     from utils.cli import print_df
 
     query = sql_path.read_text()
-    print(f'[dim]{query}[/dim]')
+    print(f'\n[dim]{query}[/dim]')
     print()
     df = pd.read_sql_query(query, CON)
     if df.empty:
