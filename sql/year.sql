@@ -1,10 +1,18 @@
 -- Year statistics
+WITH year_stats AS (
+    SELECT 
+        year,
+        COUNT(*) AS count,
+        SUM(CASE WHEN status in ('completed', 'dropped') THEN 1 ELSE 0 END) AS watched,
+        ROUND(AVG(rating), 2) AS avg_rating
+    FROM movie
+    GROUP BY year
+    -- HAVING avg_rating IS NOT NULL
+)
 SELECT 
-    year, 
-    COUNT(*) AS count,
-    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed,
-    ROUND(AVG(rating), 2) AS avg_rating
-FROM movie m
--- WHERE rating IS NOT NULL
-GROUP BY year
--- HAVING avg_rating IS NOT NULL;
+    year,
+    count,
+    watched,
+    ROUND(100.0 * watched / count, 2) || '%' as percent, 
+    avg_rating
+FROM year_stats
