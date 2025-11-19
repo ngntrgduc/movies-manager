@@ -19,6 +19,12 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - Visualization: Power BI
 - CLI: Click + Rich
 
+## Architecture
+![](images/architecture.png)
+
+## ERD
+![](/images/erd.png)
+
 ## A glimpse
 **Web interface**
 ![](/images/data.png)
