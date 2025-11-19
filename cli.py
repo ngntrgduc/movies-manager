@@ -198,11 +198,15 @@ def stats():
             print(f' - {value}: {count}')
 
 @cli.command()
-def backup():
+@click.option('--csv', help='Back up to data/backup.csv for safer recovery', is_flag=True)
+def backup(csv):
     """Back up data."""
     try:
         with sqlite3.connect(BACKUP_FILE) as backup_con:
             CON.backup(backup_con)
+        if csv:
+            df = load_movies(CON, with_index=True)
+            df.to_csv('data/backup.csv', index=False)
         print('Backup successful.')
     except Exception as e:
         print(f'Backup failed: {e}')
