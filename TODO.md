@@ -3,15 +3,11 @@
     - [ ] Using cache_resource when loading model
 - [ ] Calling LLM API for smart summarize like: total watched time,... using name and year field
   - [ ] As a chatbot interface?
-- [ ] utils.genre -> str_to_list, list_to_str conversion
 - [ ] Add testing for csv_to_sqlite and CRUD operations on database logic, using pytest, `:memory:` for testing with sqlite
 
 ### CLI
-- [ ] CLI in action, save as GIF and put it in README
-- [ ] Add `--sort` flag for `sql` command
-    - [ ] Handle multiple matches
-    - [ ] Allow inputting asc and desc for orientation (default is asc)
-- [ ] Fuzzy match for sql file for `sql` command
+- [ ] CLI demo as GIF and put it in README
+- [ ] genres subcommand, contain: list (list all genres with id), delete genre, update/edit genres, clean genres (unused genres like 'test', but maybe now this is unecessary because of ON DELETE CASCADE)
 
 ### Web App
 - [ ] Add input validation for Add and Edit pages
@@ -42,7 +38,10 @@
     - [x] Add show id checkbox for web ui in Filtering page
 - [x] Change web app Edit page layout, add Refresh button
 - [x] Add fuzzy matching with genre filtering if there is no match for genre name in the CLI
-
+- [x] Add `--sort` flag for `sql` command
+    - [x] Allow inputting asc and desc and its alias for order (default is asc)
+- [x] Fuzzy match for sql file for `sql` command
+- [x] `--csv` option for `backup` command, for writing data to data/backup.csv with the default backup behavior, offer safer recovery
 
 ## Abandoned
 - Color for dataframe using pandas Styler -> Pandas Styler does not compatible with streamlit dataframe, keep it simple
@@ -62,3 +61,4 @@
 - Use fzf for genres filtering in CL -> more dependency, also CLI is used for quick filtering, for better UX, go to web app
 - Filtering using SQL for Data page -> using pandas does not significant slower than filtering using SQL, and often faster than SQL
 - Add simple filtering mechanism for Edit page -> Ctrl + F is enough
+- Add `--group` option for filter command, in rich.Table add line to separate it using add_section() -> hard to implement, complex and harder to maintain
