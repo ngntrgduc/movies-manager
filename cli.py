@@ -263,6 +263,10 @@ def sql(filename, note, sort):
         return
 
     from difflib import get_close_matches
+    def get_fuzzy_match(value: str, choices: list[str], n: int = 1) -> str | None:
+        """Return the closest fuzzy match to `value` among `choices`."""
+        matches = get_close_matches(value, choices, n=n)
+        return matches[0] if matches else None
     
     # If exact file doesn't exist -> attempt prefix match + fuzzy match
     sql_path = sql_folder / f'{filename}.sql'
@@ -276,9 +280,9 @@ def sql(filename, note, sort):
             print(f"Closest prefix match: '{matched_name}.sql'")
         else:
             # Fuzzy match
-            fuzzy_match = get_close_matches(filename, sql_files, n=1)
+            fuzzy_match = get_fuzzy_match(filename, sql_files)
             if fuzzy_match:
-                matched_name = fuzzy_match[0]
+                matched_name = fuzzy_match
                 print(f"Closest fuzzy match: '{matched_name}.sql'") 
             else:
                 print(f"No similar SQL files found in '{sql_folder}/'")
@@ -307,7 +311,7 @@ def sql(filename, note, sort):
 
     if sort:
         column, order = sort
-        fuzzy_match = get_close_matches(column, list(df.columns), n=1)
+        fuzzy_match = get_fuzzy_match(column, list(df.columns))
         if not fuzzy_match:
             print(f"Column '{column}' not found. Skipping sort.\n")
         else:
@@ -319,7 +323,7 @@ def sql(filename, note, sort):
                 ascending = True  # default if invalid
                 print(f"Invalid sort order '{order}', using 'asc' by default.\n")
 
-            matched_column = fuzzy_match[0]
+            matched_column = fuzzy_match
             if df[matched_column].astype(str).str.contains('%').any():
                 df = df.sort_values(by=[matched_column], ascending=ascending, 
                                     key=lambda col: col.str.rstrip('%').astype(float))
