@@ -106,7 +106,7 @@ def print_df(df) -> None:
 
 def apply_filters(
     df, name=None, year=None, status=None, movie_type=None, 
-    country=None, genres=None, rating=None, watched_year=None
+    country=None, genres=None, rating=None, watched_year=None, note_contains=None
 ):
     """Apply filters to the movie DataFrame."""
     import pandas as pd
@@ -152,6 +152,8 @@ def apply_filters(
             mask &= fuzzy_mask
     if rating:
         mask &= df['rating'] == rating
+    if note_contains:
+        mask &= df['note'].str.contains(note_contains, case=False, na=False)
 
     # prevent showing all rows after filtering
     if mask.all():

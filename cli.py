@@ -30,14 +30,18 @@ def cli():
 @click.option('-g', '--genres', help='Filter by genres (comma-separated)')
 @click.option('-r', '--rating', type=click.IntRange(1, 10, clamp=True), help='Filter by rating')
 @click.option('-w', '--watched-year', help='Filter by watched year')
+@click.option('-nc', '--note-contains', help='Filter by substring in note (case-insensitive)')
 @click.option('--sort', help='Sort result by year or rating or watched date')
 @click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
 @click.option('--note', help='Show notes', is_flag=True)
-def filter(name, year, status, movie_type, country, genres, rating, watched_year, sort, stats, note):
+def filter(
+    name, year, status, movie_type, country, genres, rating, watched_year, sort, 
+    stats, note, note_contains
+):
     """Filter movies by attributes."""
 
     # Prevent printing all movies to the command line when using with just flags
-    filters = [name, year, status, movie_type, country, genres, rating, watched_year]
+    filters = [name, year, status, movie_type, country, genres, rating, watched_year, note_contains]
     has_filter = any(arg is not None for arg in filters)
     if not has_filter:
         print('No filters specified. Use --help to see available options.')
@@ -49,12 +53,13 @@ def filter(name, year, status, movie_type, country, genres, rating, watched_year
     # For table displaying purpose
     df['year'] = df['year'].astype('Int64')
     df['rating'] = df['rating'].astype('Int64')
-    if not note:
-        df.drop('note', axis=1, inplace=True)
 
     filtered_df = apply_filters(
-        df, name, year, status, movie_type, country, genres, rating, watched_year
+        df, name, year, status, movie_type, country, genres, rating, watched_year, note_contains
     )
+    
+    if not note:
+        filtered_df.drop('note', axis=1, inplace=True)
 
     sort = sort.strip() if sort else None
     if sort:
