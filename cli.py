@@ -187,9 +187,19 @@ def delete(movie_id: int):
 @cli.command()
 def stats():
     """Show statistics for the movie data."""
+    def fetch_scalar(cur, query) -> int | float:
+        """Run a SQL query and return its single scalar value."""
+        return cur.execute(query).fetchone()[0]
+
     cur = CON.cursor()
-    total = cur.execute('SELECT COUNT(*) FROM movie').fetchone()[0]
+    total = fetch_scalar(cur, 'SELECT COUNT(*) FROM movie')
+    avg_rating = fetch_scalar(cur, 'SELECT ROUND(AVG(rating), 2) FROM movie')
+    genres_count = fetch_scalar(cur, 'SELECT COUNT(*) FROM genre')
+
     print(f'Total: {total}')
+    print(f'Average rating: {avg_rating}')
+    print(f'Genres count: {genres_count}')
+
     for col in ['status', 'type', 'country']:
         query = f"""
             SELECT {col}, COUNT(*) as count 
