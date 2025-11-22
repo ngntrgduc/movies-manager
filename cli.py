@@ -59,7 +59,7 @@ def filter(
     )
     
     if not note:
-        filtered_df.drop('note', axis=1, inplace=True)
+        filtered_df = filtered_df.drop('note', axis=1)
 
     sort = sort.strip() if sort else None
     if sort:
@@ -316,7 +316,7 @@ def sql(filename, note, sort):
             df[col] = df[col].astype('Int64')
     
     if not note and 'note' in df.columns:
-        df.drop('note', axis=1, inplace=True)
+        df = df.drop('note', axis=1)
 
     if sort:
         column, order = sort
