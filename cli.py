@@ -185,7 +185,8 @@ def delete(movie_id: int):
         print('Deletion cancelled.')
 
 @cli.command()
-def stats():
+@click.option('-v', '--verbose', help='Show extended statistics.', is_flag=True)
+def stats(verbose):
     """Show statistics for the movie data."""
     from utils.cli import print_rows
     from utils.db import fetch_scalar, fetch_rows
@@ -200,8 +201,15 @@ def stats():
     print(f'Genres count: {genres_count}')
 
     sql_folder = Path('sql/')
-    for stat_file in ['status', 'type', 'country']:
+    basic_files = ['status', 'type', 'country']
+    extended_files = ['watchedyear', 'rating', 'genres']
+
+    stat_files = basic_files + extended_files if verbose else basic_files
+    for stat_file in stat_files:
         sql_path = sql_folder / f'{stat_file}.sql'
+        if not sql_path.exists():
+            print(f'SQL file {sql_path.name!r} not found.')
+            continue
         query = sql_path.read_text()
         rows, column_names = fetch_rows(cur, query)
         print_rows(rows, column_names, title=f'{stat_file.capitalize()}:')
