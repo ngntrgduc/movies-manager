@@ -201,10 +201,12 @@ def stats(verbose):
     print(f'Genres count: {genres_count}')
 
     sql_folder = Path('sql/')
-    basic_files = ['status', 'type', 'country']
+    stat_files = ['status', 'type', 'country']
     extended_files = ['watchedyear', 'rating', 'genres']
 
-    stat_files = basic_files + extended_files if verbose else basic_files
+    if verbose:
+        stat_files.extend(extended_files)
+
     for stat_file in stat_files:
         sql_path = sql_folder / f'{stat_file}.sql'
         if not sql_path.exists():
