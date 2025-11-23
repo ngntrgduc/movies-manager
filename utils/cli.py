@@ -86,7 +86,7 @@ def valid_date(date: str) -> str:
 
 
 def print_df(df) -> None:
-    """Display a DataFrame in a rich table."""
+    """Display a DataFrame in a Rich table."""
     import pandas as pd
     from rich.console import Console
     from rich.table import Table
