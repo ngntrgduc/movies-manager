@@ -275,9 +275,9 @@ def sql(filename, note, sort):
         print_sql_files(sql_files)
         return
 
-    from difflib import get_close_matches
     def get_fuzzy_match(value: str, choices: list[str], n: int = 1) -> str | None:
         """Return the closest fuzzy match to `value` among `choices`."""
+        from difflib import get_close_matches
         matches = get_close_matches(value, choices, n=n)
         return matches[0] if matches else None
     
@@ -304,8 +304,7 @@ def sql(filename, note, sort):
         sql_path = sql_path.with_stem(matched_name)
 
     query = sql_path.read_text()
-    print(f'\n[dim]{query}[/dim]')
-    print()
+    print(f'\n[dim]{query}[/dim]\n')
 
     from utils.cli import print_rows
     from utils.db import fetch_rows
