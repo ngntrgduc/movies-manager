@@ -312,31 +312,41 @@ def sql(filename, note, sort):
 
         sql_path = sql_path.with_stem(matched_name)
 
-    import pandas as pd
-    from utils.cli import print_df
-
     query = sql_path.read_text()
     print(f'\n[dim]{query}[/dim]')
     print()
-    df = pd.read_sql_query(query, CON)
-    if df.empty:
-        print('No data.')
-        return 
+
+    from utils.cli import print_rows
+    def fetch_rows(cur: sqlite3.Cursor, query: str) -> tuple[list[tuple], list[str]]:
+        """Run a SQL query and return its rows and column names."""
+        cur.execute(query)
+        rows = cur.fetchall()
+        column_names = [d[0] for d in cur.description]
+        return rows, column_names
+
+    cur = CON.cursor()
+    rows, column_names = fetch_rows(cur, query)
+    rows = [list(row) for row in rows]  # covert tuple to list
 
     # Handle numeric format
-    for col in ['rating', 'year']:
-        if col in df.columns:
-            df[col] = df[col].astype('Int64')
-    
-    if not note and 'note' in df.columns:
-        df = df.drop('note', axis=1)
+    if 'rating' in column_names:
+        col_idx = column_names.index('rating')
+        for row in rows:
+            if row[col_idx] is not None:
+                row[col_idx] = int(row[col_idx])
+
+    if not note and 'note' in column_names:
+        rows = [row[:-1] for row in rows]  # assume 'note' always the last column
+        column_names.remove('note')
 
     if sort:
         column, order = sort
-        fuzzy_match = get_fuzzy_match(column, list(df.columns))
-        if not fuzzy_match:
+        matched_column = get_fuzzy_match(column, column_names)
+        if not matched_column:
             print(f"Column '{column}' not found. Skipping sort.\n")
         else:
+            from utils.cli import parse_sort_column
+
             if order in ('asc', 'a', '+'):
                 ascending = True
             elif order in ('desc', 'd', '-'):
@@ -345,15 +355,15 @@ def sql(filename, note, sort):
                 ascending = True  # default if invalid
                 print(f"Invalid sort order '{order}', using 'asc' by default.\n")
 
-            matched_column = fuzzy_match
-            if df[matched_column].astype(str).str.contains('%').any():
-                df = df.sort_values(by=[matched_column], ascending=ascending, 
-                                    key=lambda col: col.str.rstrip('%').astype(float))
-            else:
-                df = df.sort_values(by=[matched_column], ascending=ascending)
+            col_idx = column_names.index(matched_column)
+            rows.sort(
+                key=lambda row: parse_sort_column(row[col_idx]), 
+                reverse=not ascending
+            )
 
-    print_df(df)
-    print(f'Total: {df.shape[0]}')
+    print_rows(rows, column_names)
+    print(f'Total: {len(rows)}')
+
 
 if __name__ == '__main__':
     try:

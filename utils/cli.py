@@ -178,3 +178,29 @@ def apply_filters(
         mask[:] = False
 
     return df[mask]
+
+def parse_sort_column(value):
+    """Normalize a value for sorting in CLI tables."""
+    if value is None:
+        return float('inf')  # None always last in ascending
+
+    # Percent: "85%" → 85.0
+    if isinstance(value, str) and value.endswith('%'):
+        try:
+            return float(value.rstrip('%'))
+        except ValueError:
+            return value.lower()
+
+    # Numeric string: "42", "7.2"
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return value.lower()
+
+    # Already numeric
+    if isinstance(value, (int, float)):
+        return value
+
+    # Fallback: string
+    return str(value).lower()
