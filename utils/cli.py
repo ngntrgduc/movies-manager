@@ -86,7 +86,7 @@ def valid_date(date: str) -> str:
 
 
 def print_df(df) -> None:
-    """Display a DataFrame as a rich table."""
+    """Display a DataFrame in a rich table."""
     import pandas as pd
     from rich.console import Console
     from rich.table import Table
@@ -100,6 +100,24 @@ def print_df(df) -> None:
 
     for _, row in df.iterrows():
         table.add_row(*[str(x) if pd.notna(x) else '' for x in row])
+
+    console = Console()
+    console.print(table)
+
+def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None:
+    """Display rows in a Rich table."""
+    from rich.console import Console
+    from rich.table import Table
+    
+    table = Table(
+        title=title, title_justify='left', title_style='bold',
+        show_header=True, header_style='bold blue'
+    )
+    for header in headers:
+        table.add_column(header)
+
+    for row in rows:
+        table.add_row(*[str(x) if x is not None else '' for x in row])
 
     console = Console()
     console.print(table)
