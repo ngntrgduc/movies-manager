@@ -200,17 +200,20 @@ def stats():
     print(f'Average rating: {avg_rating}')
     print(f'Genres count: {genres_count}')
 
-    for col in ['status', 'type', 'country']:
-        query = f"""
-            SELECT {col}, COUNT(*) as count 
-            FROM movie
-            GROUP BY {col}
-            ORDER BY count DESC
-        """
-        rows = cur.execute(query).fetchall()
-        print(col.capitalize())
-        for value, count in rows:
-            print(f' - {value}: {count}')
+    from utils.cli import print_rows
+    def fetch_rows(cur: sqlite3.Cursor, query: str) -> tuple[list[tuple], list[str]]:
+        """Run a SQL query and return its rows and column names."""
+        cur.execute(query)
+        rows = cur.fetchall()
+        column_names = [d[0] for d in cur.description]
+        return rows, column_names
+
+    sql_folder = Path('sql/')
+    for stat_file in ['status', 'type', 'country']:
+        sql_path = sql_folder / f'{stat_file}.sql'
+        query = sql_path.read_text()
+        rows, column_names = fetch_rows(cur, query)
+        print_rows(rows, column_names, title=f'{stat_file.capitalize()}:')
 
 @cli.command()
 @click.option('--csv', help='Back up to data/backup.csv for safer recovery', is_flag=True)
