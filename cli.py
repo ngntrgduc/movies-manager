@@ -187,26 +187,17 @@ def delete(movie_id: int):
 @cli.command()
 def stats():
     """Show statistics for the movie data."""
-    def fetch_scalar(cur, query) -> int | float:
-        """Run a SQL query and return its single scalar value."""
-        return cur.execute(query).fetchone()[0]
+    from utils.cli import print_rows
+    from utils.db import fetch_scalar, fetch_rows
 
     cur = CON.cursor()
+
     total = fetch_scalar(cur, 'SELECT COUNT(*) FROM movie')
     avg_rating = fetch_scalar(cur, 'SELECT ROUND(AVG(rating), 2) FROM movie')
     genres_count = fetch_scalar(cur, 'SELECT COUNT(*) FROM genre')
-
     print(f'Total: {total}')
     print(f'Average rating: {avg_rating}')
     print(f'Genres count: {genres_count}')
-
-    from utils.cli import print_rows
-    def fetch_rows(cur: sqlite3.Cursor, query: str) -> tuple[list[tuple], list[str]]:
-        """Run a SQL query and return its rows and column names."""
-        cur.execute(query)
-        rows = cur.fetchall()
-        column_names = [d[0] for d in cur.description]
-        return rows, column_names
 
     sql_folder = Path('sql/')
     for stat_file in ['status', 'type', 'country']:
@@ -317,12 +308,7 @@ def sql(filename, note, sort):
     print()
 
     from utils.cli import print_rows
-    def fetch_rows(cur: sqlite3.Cursor, query: str) -> tuple[list[tuple], list[str]]:
-        """Run a SQL query and return its rows and column names."""
-        cur.execute(query)
-        rows = cur.fetchall()
-        column_names = [d[0] for d in cur.description]
-        return rows, column_names
+    from utils.db import fetch_rows
 
     cur = CON.cursor()
     rows, column_names = fetch_rows(cur, query)
