@@ -8,4 +8,4 @@ SELECT
     ROUND(AVG(rating), 2) AS avg_rating
 FROM movie
 GROUP BY status
-ORDER BY count
+ORDER BY count DESC
