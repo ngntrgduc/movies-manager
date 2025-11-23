@@ -319,7 +319,7 @@ def sql(filename, note, sort):
 
     cur = CON.cursor()
     rows, column_names = fetch_rows(cur, query)
-    rows = [list(row) for row in rows]  # covert tuple to list
+    rows = [list(row) for row in rows]  # convert tuple to list
 
     # Handle numeric format
     if 'rating' in column_names:
@@ -333,25 +333,24 @@ def sql(filename, note, sort):
         column_names.remove('note')
 
     if sort:
-        column, order = sort
-        matched_column = get_fuzzy_match(column, column_names)
+        sort_column, sort_order = sort
+        matched_column = get_fuzzy_match(sort_column, column_names)
         if not matched_column:
-            print(f"Column '{column}' not found. Skipping sort.\n")
+            print(f"Column '{sort_column}' not found. Skipping sort.\n")
         else:
             from utils.cli import parse_sort_column
 
-            if order in ('asc', 'a', '+'):
-                ascending = True
-            elif order in ('desc', 'd', '-'):
-                ascending = False
-            else:
-                ascending = True  # default if invalid
-                print(f"Invalid sort order '{order}', using 'asc' by default.\n")
+            descending_aliases = {'desc', 'd', '-'}
+            descending = sort_order in descending_aliases
+
+            valid_orders = descending_aliases | {'asc', 'a', '+'}
+            if sort_order not in valid_orders:
+                print(f"Invalid sort order '{sort_order}'. Using ascending.\n")
 
             col_idx = column_names.index(matched_column)
             rows.sort(
                 key=lambda row: parse_sort_column(row[col_idx]), 
-                reverse=not ascending
+                reverse=descending
             )
 
     print_rows(rows, column_names)
