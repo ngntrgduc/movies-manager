@@ -259,7 +259,8 @@ def restore():
 @click.argument('filename', type=str, required=False)
 @click.option('--note', help='Show notes', is_flag=True)
 @click.option('-s', '--sort', help='Sort result by column', nargs=2)
-def sql(filename, note, sort):
+@click.option('-v', '--verbose', help='Show SQL file contents', is_flag=True)
+def sql(filename, note, sort, verbose):
     """Run a SQL file from the 'sql/' folder."""
 
     sql_folder = Path('sql/')
@@ -314,7 +315,8 @@ def sql(filename, note, sort):
         sql_path = sql_path.with_stem(matched_name)
 
     query = sql_path.read_text()
-    print(f'\n[dim]{query}[/dim]\n')
+    if verbose:
+        print(f'\n[dim]{query}[/dim]\n')
 
     from utils.cli import print_rows
     from utils.db import fetch_rows
