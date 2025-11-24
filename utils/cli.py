@@ -67,14 +67,12 @@ class AbbrevChoice(click.Choice):
         except ValueError as e:
             self.fail(str(e), param, ctx)
 
-
 def valid_date(date: str) -> str:
     from datetime import datetime
     if date.strip() == '':
         return ''
 
-    formats = ['%Y', '%Y-%m', '%Y-%m-%d']
-    for format in formats:
+    for format in ('%Y', '%Y-%m', '%Y-%m-%d'):
         try:
             return datetime.strptime(date, format).strftime(format)
         except ValueError:
@@ -83,7 +81,6 @@ def valid_date(date: str) -> str:
     raise click.BadParameter(
         f"{date!r} does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
     )
-
 
 def print_df(df) -> None:
     """Display a DataFrame in a Rich table."""
@@ -179,28 +176,45 @@ def apply_filters(
 
     return df[mask]
 
+from datetime import datetime
 def parse_sort_column(value):
-    """Normalize a value for sorting in CLI tables."""
+    """
+    Normalize a value into a sortable key.
+
+    Returns a tuple `(type_priority, normalized_value)` so that
+    mixed types never get compared directly during sorting.
+
+    Priority order:
+        0: numeric
+        1: percentage
+        2: date (YYYY / YYYY-MM / YYYY-MM-DD)
+        3: string
+        4: None (always last)
+    """
+
     if value is None:
-        return float('inf')  # None always last in ascending
+        return (4, '')  # None always last in ascending
 
-    # Percent: "85%" → 85.0
-    if isinstance(value, str) and value.endswith('%'):
-        try:
-            return float(value.rstrip('%'))
-        except ValueError:
-            return value.lower()
-
-    # Numeric string: "42", "7.2"
-    if isinstance(value, str):
-        try:
-            return float(value)
-        except ValueError:
-            return value.lower()
-
-    # Already numeric
+    # Numeric values
     if isinstance(value, (int, float)):
-        return value
+        return (0, float(value))
+    
+    if isinstance(value, str):
+        # Percentages ("85%" -> 85.0)
+        # Checked before numeric-like to avoid raising Exception for float("85%")
+        if value.endswith('%'):
+            try:
+                return (1, float(value.rstrip('%')))
+            except ValueError:
+                pass
 
-    # Fallback: string
-    return str(value).lower()
+        # Dates string
+        for format in ('%Y', '%Y-%m', '%Y-%m-%d'):
+            try:
+                datetime.strptime(value, format)
+                return (2, value)
+            except ValueError:
+                continue
+        
+    # Fallback: regular string
+    return (3, value.lower())
