@@ -340,7 +340,7 @@ def sql(filename, note, sort, verbose):
         sort_column, sort_order = sort
         matched_column = get_fuzzy_match(sort_column, column_names)
         if not matched_column:
-            print(f"Column '{sort_column}' not found. Skipping sort.\n")
+            print(f'Column {sort_column!r} not found. Skipping sort.')
         else:
             from utils.cli import parse_sort_column
 
@@ -349,7 +349,7 @@ def sql(filename, note, sort, verbose):
 
             valid_orders = descending_aliases | {'asc', 'a', '+'}
             if sort_order not in valid_orders:
-                print(f"Invalid sort order '{sort_order}'. Using ascending.\n")
+                print(f'Invalid sort order {sort_order!r}. Using ascending.')
 
             col_idx = column_names.index(matched_column)
             rows.sort(
