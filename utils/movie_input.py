@@ -100,6 +100,10 @@ def prompt_update_movie(existing_movie: dict) -> dict:
     for field, value in existing_movie.items():
         if value == '':
             existing_movie[field] = None
+    
+    # Ensure genres format of the new movie matches the format of the old movie,
+    # prevent genres from being displayed when updating without genre updates
+    existing_movie['genres'] = format_genres(existing_movie['genres'])
 
     # Only include fields that have changed compared to the existing movie
     updated_data = {field: value for field, value in movie.items()
