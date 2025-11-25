@@ -360,6 +360,38 @@ def sql(filename, note, sort, verbose):
     print_rows(rows, column_names)
     print(f'Total: {len(rows)}')
 
+@cli.command()
+@click.argument('number', type=int, required=False, default=10)
+@click.option('--note', help='Show notes', is_flag=True)
+def recent(number, note):
+    """List recently watched movies."""
+    sql_folder = Path('sql/')
+    sql_path = sql_folder / 'command' / 'recent.sql'
+    if not sql_path.exists():
+        print(f"SQL file '{sql_path}' not found.")
+        return
+
+    query = sql_path.read_text()
+
+    from utils.db import fetch_rows
+    from utils.cli import print_rows
+
+    cur = CON.cursor()
+    rows, column_names = fetch_rows(cur, query, (number,))
+    rows = [list(row) for row in rows]  # convert tuple to list
+
+    # Handle numeric format
+    if 'rating' in column_names:
+        col_idx = column_names.index('rating')
+        for row in rows:
+            if row[col_idx] is not None:
+                row[col_idx] = int(row[col_idx])
+    
+    if not note and 'note' in column_names:
+        rows = [row[:-1] for row in rows]  # assume 'note' always the last column
+        column_names.remove('note')
+
+    print_rows(rows, column_names)
 
 if __name__ == '__main__':
     try:
