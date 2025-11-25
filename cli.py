@@ -263,18 +263,9 @@ def restore():
 def sql(filename, note, sort, verbose):
     """Run a SQL file from the 'sql/' folder."""
     from utils.sql import list_sql_files
+    from utils.cli import print_sql_files
 
     sql_folder = Path('sql/')
-
-    def print_sql_files(sql_files: list[str]) -> None:
-        """Print a list of available SQL files."""
-        from rich.columns import Columns
-        from rich.console import Console
-        console = Console(width=60)
-        console.print('[bold cyan]Available SQL files:[/bold cyan]')
-        colored_files = [f'[green]{name}[/green]' for name in sql_files]
-        console.print(Columns(colored_files, equal=True, expand=True))
-
     sql_files = list_sql_files()
     if not filename:
         print_sql_files(sql_files)

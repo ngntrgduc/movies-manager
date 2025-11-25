@@ -175,3 +175,12 @@ def apply_filters(
         mask[:] = False
 
     return df[mask]
+
+def print_sql_files(sql_files: list[str]) -> None:
+    """Print a list of available SQL files."""
+    from rich.columns import Columns
+    from rich.console import Console
+    console = Console(width=60)
+    console.print('[bold cyan]Available SQL files:[/bold cyan]')
+    colored_files = [f'[green]{name}[/green]' for name in sql_files]
+    console.print(Columns(colored_files, equal=True, expand=True))
