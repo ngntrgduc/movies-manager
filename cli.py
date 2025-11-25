@@ -255,14 +255,16 @@ def restore():
     except Exception as e:
         print(f'Restore failed: {e}')
 
+from utils.timing import timing
 @cli.command()
 @click.argument('filename', type=str, required=False)
 @click.option('--note', help='Show notes', is_flag=True)
 @click.option('-s', '--sort', help='Sort result by column', nargs=2)
 @click.option('-v', '--verbose', help='Show SQL file contents', is_flag=True)
+@timing
 def sql(filename, note, sort, verbose):
     """Run a SQL file from the 'sql/' folder."""
-    from utils.sql import list_sql_files
+    from utils.sql import list_sql_files, resolve_sql_path, get_fuzzy_match
     from utils.cli import print_sql_files
 
     sql_folder = Path('sql/')
@@ -271,33 +273,11 @@ def sql(filename, note, sort, verbose):
         print_sql_files(sql_files)
         return
 
-    def get_fuzzy_match(value: str, choices: list[str], n: int = 1) -> str | None:
-        """Return the closest fuzzy match to `value` among `choices`."""
-        from difflib import get_close_matches
-        matches = get_close_matches(value, choices, n=n)
-        return matches[0] if matches else None
-    
-    # If exact file doesn't exist -> attempt prefix match + fuzzy match
-    sql_path = sql_folder / f'{filename}.sql'
-    if not sql_path.exists():
-        print(f'SQL file {sql_path.name!r} not found.')
-
-        # Prefix match
-        prefix_matches = [name for name in sql_files if name.startswith(filename)]
-        if prefix_matches:
-            matched_name = prefix_matches[0]
-            print(f"Closest prefix match: '{matched_name}.sql'")
-        else:
-            # Fuzzy match
-            fuzzy_match = get_fuzzy_match(filename, sql_files)
-            if fuzzy_match:
-                matched_name = fuzzy_match
-                print(f"Closest fuzzy match: '{matched_name}.sql'") 
-            else:
-                print(f"No similar SQL files found in '{sql_folder}/'")
-                return
-
-        sql_path = sql_path.with_stem(matched_name)
+    sql_path, match_type = resolve_sql_path(filename, sql_folder, sql_files)
+    if match_type is None:
+        raise FileNotFoundError(f"No SQL file found matching '{filename}'")
+    else:
+        print(f"{match_type} match: '{sql_path}'")
 
     query = sql_path.read_text()
     if verbose:
