@@ -1,8 +1,7 @@
 from pathlib import Path
 
-def list_sql_files() -> list[str]:
+def list_sql_files(sql_folder: Path) -> list[str]:
     """Return a list of all SQL files in the 'sql/' folder."""
-    sql_folder = Path('sql/')
     excluded = ['schema.sql']
     return [
         f.stem for f in sql_folder.glob('*.sql')

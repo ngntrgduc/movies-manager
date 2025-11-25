@@ -268,7 +268,7 @@ def sql(filename, note, sort, verbose):
     from utils.cli import print_sql_files
 
     sql_folder = Path('sql/')
-    sql_files = list_sql_files()
+    sql_files = list_sql_files(sql_folder)
     if not filename:
         print_sql_files(sql_files)
         return
