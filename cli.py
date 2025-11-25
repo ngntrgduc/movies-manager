@@ -262,15 +262,9 @@ def restore():
 @click.option('-v', '--verbose', help='Show SQL file contents', is_flag=True)
 def sql(filename, note, sort, verbose):
     """Run a SQL file from the 'sql/' folder."""
+    from utils.sql import list_sql_files
 
     sql_folder = Path('sql/')
-    def list_sql_files() -> list[str]:
-        """Return a list of all SQL files in the 'sql/' folder."""
-        excluded = ['schema.sql']
-        return [
-            f.stem for f in sql_folder.glob('*.sql')
-            if f.name not in excluded
-        ]
 
     def print_sql_files(sql_files: list[str]) -> None:
         """Print a list of available SQL files."""
@@ -342,7 +336,7 @@ def sql(filename, note, sort, verbose):
         if not matched_column:
             print(f'Column {sort_column!r} not found. Skipping sort.')
         else:
-            from utils.cli import parse_sort_column
+            from utils.sql import parse_sort_column
 
             descending_aliases = {'desc', 'd', '-'}
             descending = sort_order in descending_aliases
