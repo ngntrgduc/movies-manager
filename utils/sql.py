@@ -85,3 +85,56 @@ def parse_sort_column(value):
         
     # Fallback: regular string
     return (3, value.lower())
+
+def run_sql(cur, query: str, note: bool = False, sort: tuple[str, str] | None = None) -> None:
+    """
+    Run a SQL query and display the results, optionally hiding the 'note' column,
+    converting 'rating' to int, and sorting by a column.
+
+    Args:
+        cur: SQLite cursor object
+        query: SQL query string to execute
+        note: Show the 'note' column if True; hide if False
+        sort: Tuple (column_name, order) to sort results.
+              order can be 'asc', 'a', '+', 'desc', 'd', '-'
+    """
+    from utils.cli import print_rows
+    from utils.db import fetch_rows
+
+    rows, column_names = fetch_rows(cur, query)
+    rows = [list(row) for row in rows]  # convert tuple to list
+
+    # Convert rating to int if present
+    if 'rating' in column_names:
+        col_idx = column_names.index('rating')
+        for row in rows:
+            if row[col_idx] is not None:
+                row[col_idx] = int(row[col_idx])
+
+    # Hide note column
+    if not note and 'note' in column_names:
+        rows = [row[:-1] for row in rows]  # assume 'note' always the last column
+        column_names.remove('note')
+
+    # Sorting
+    if sort:
+        sort_column, sort_order = sort
+        matched_column = get_fuzzy_match(sort_column, column_names)
+        if not matched_column:
+            print(f'Column {sort_column!r} not found. Skipping sort.')
+        else:
+            descending_aliases = {'desc', 'd', '-'}
+            descending = sort_order in descending_aliases
+
+            valid_orders = descending_aliases | {'asc', 'a', '+'}
+            if sort_order not in valid_orders:
+                print(f'Invalid sort order {sort_order!r}. Using ascending.')
+
+            col_idx = column_names.index(matched_column)
+            rows.sort(
+                key=lambda row: parse_sort_column(row[col_idx]), 
+                reverse=descending
+            )
+
+    print_rows(rows, column_names)
+    print(f'Total: {len(rows)}')

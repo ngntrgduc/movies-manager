@@ -264,7 +264,7 @@ from utils.timing import timing
 @timing
 def sql(filename, note, sort, verbose):
     """Run a SQL file from the 'sql/' folder."""
-    from utils.sql import list_sql_files, resolve_sql_path, get_fuzzy_match
+    from utils.sql import list_sql_files
     from utils.cli import print_sql_files
 
     sql_folder = Path('sql/')
@@ -273,57 +273,20 @@ def sql(filename, note, sort, verbose):
         print_sql_files(sql_files)
         return
 
+    from utils.sql import resolve_sql_path
     sql_path, match_type = resolve_sql_path(filename, sql_folder, sql_files)
     if match_type is None:
         raise FileNotFoundError(f"No SQL file found matching '{filename}'")
     else:
-        print(f"{match_type} match: '{sql_path}'")
+        print(f"{match_type} match: '{sql_path.name}'")
 
     query = sql_path.read_text()
     if verbose:
         print(f'\n[dim]{query}[/dim]\n')
 
-    from utils.cli import print_rows
-    from utils.db import fetch_rows
-
+    from utils.sql import run_sql
     cur = CON.cursor()
-    rows, column_names = fetch_rows(cur, query)
-    rows = [list(row) for row in rows]  # convert tuple to list
-
-    # Handle numeric format
-    if 'rating' in column_names:
-        col_idx = column_names.index('rating')
-        for row in rows:
-            if row[col_idx] is not None:
-                row[col_idx] = int(row[col_idx])
-
-    if not note and 'note' in column_names:
-        rows = [row[:-1] for row in rows]  # assume 'note' always the last column
-        column_names.remove('note')
-
-    if sort:
-        sort_column, sort_order = sort
-        matched_column = get_fuzzy_match(sort_column, column_names)
-        if not matched_column:
-            print(f'Column {sort_column!r} not found. Skipping sort.')
-        else:
-            from utils.sql import parse_sort_column
-
-            descending_aliases = {'desc', 'd', '-'}
-            descending = sort_order in descending_aliases
-
-            valid_orders = descending_aliases | {'asc', 'a', '+'}
-            if sort_order not in valid_orders:
-                print(f'Invalid sort order {sort_order!r}. Using ascending.')
-
-            col_idx = column_names.index(matched_column)
-            rows.sort(
-                key=lambda row: parse_sort_column(row[col_idx]), 
-                reverse=descending
-            )
-
-    print_rows(rows, column_names)
-    print(f'Total: {len(rows)}')
+    run_sql(cur, query, note=note, sort=sort)
 
 @cli.command()
 @click.argument('number', type=int, required=False, default=10)
