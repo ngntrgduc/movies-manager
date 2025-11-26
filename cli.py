@@ -292,7 +292,11 @@ def sql(filename, note, sort, verbose):
 @click.argument('number', type=int, required=False, default=10)
 @click.option('--note', help='Show notes', is_flag=True)
 def recent(number, note):
-    """List recently watched movies."""
+    """
+    List recently watched movies.
+    
+    NUMBER  Number of movies to show (default: 10)
+    """
     sql_folder = Path('sql/')
     sql_path = sql_folder / 'command' / 'recent.sql'
     if not sql_path.exists():
