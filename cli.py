@@ -301,25 +301,10 @@ def recent(number, note):
 
     query = sql_path.read_text()
 
-    from utils.db import fetch_rows
-    from utils.cli import print_rows
-
+    from utils.sql import run_sql
     cur = CON.cursor()
-    rows, column_names = fetch_rows(cur, query, (number,))
-    rows = [list(row) for row in rows]  # convert tuple to list
+    run_sql(cur, query, parameters=(number,), note=note)
 
-    # Handle numeric format
-    if 'rating' in column_names:
-        col_idx = column_names.index('rating')
-        for row in rows:
-            if row[col_idx] is not None:
-                row[col_idx] = int(row[col_idx])
-    
-    if not note and 'note' in column_names:
-        rows = [row[:-1] for row in rows]  # assume 'note' always the last column
-        column_names.remove('note')
-
-    print_rows(rows, column_names)
 
 if __name__ == '__main__':
     try:
