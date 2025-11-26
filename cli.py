@@ -3,6 +3,7 @@ import sqlite3
 from rich import print
 from pathlib import Path
 from utils.movie import get_connection, load_movies
+from utils.timing import timing
 
 DB_FILE = Path('data/movies.db')
 BACKUP_FILE = Path('data/backup.db')
@@ -34,6 +35,7 @@ def cli():
 @click.option('--sort', help='Sort result by year or rating or watched date')
 @click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
 @click.option('--note', help='Show notes', is_flag=True)
+@timing
 def filter(
     name, year, status, movie_type, country, genres, rating, watched_year, sort, 
     stats, note, note_contains
@@ -255,7 +257,6 @@ def restore():
     except Exception as e:
         print(f'Restore failed: {e}')
 
-from utils.timing import timing
 @cli.command()
 @click.argument('filename', type=str, required=False)
 @click.option('--note', help='Show notes', is_flag=True)
@@ -309,6 +310,25 @@ def recent(number, note):
     cur = CON.cursor()
     run_sql(cur, query, parameters=(number,), note=note)
 
+@cli.command()
+@click.argument('keyword', type=str)
+@click.option('--note', help='Show notes', is_flag=True)
+@timing
+def search(keyword, note):
+    """
+    Search movies by keyword.
+
+    Default searches in 'name'. Use --note to search in 'note' and display it.
+    """
+
+    if note:
+        query = "SELECT * FROM movie_detail WHERE note LIKE '%' || ? || '%'"
+    else:
+        query = "SELECT * FROM movie_detail WHERE name LIKE '%' || ? || '%'"
+
+    from utils.sql import run_sql
+    cur = CON.cursor()
+    run_sql(cur, query, parameters=(keyword,), note=note)
 
 if __name__ == '__main__':
     try:
