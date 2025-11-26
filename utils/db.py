@@ -5,11 +5,11 @@ def fetch_scalar(cur: sqlite3.Cursor, query: str) -> int | float:
     return cur.execute(query).fetchone()[0]
 
 def fetch_rows(
-    cur: sqlite3.Cursor, query: str, parameter: tuple = None
+    cur: sqlite3.Cursor, query: str, parameters: tuple = None
 ) -> tuple[list[tuple], list[str]]:
     """Run a (parameterized) SQL query and return its rows and column names."""
-    if parameter:
-        cur.execute(query, parameter)
+    if parameters:
+        cur.execute(query, parameters)
     else:
         cur.execute(query)
 
