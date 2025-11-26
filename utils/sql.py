@@ -85,22 +85,35 @@ def parse_sort_column(value):
     # Fallback: regular string
     return (3, value.lower())
 
-def run_sql(cur, query: str, note: bool = False, sort: tuple[str, str] | None = None) -> None:
+def run_sql(
+    cur, 
+    query: str, 
+    parameters: tuple | None = None,
+    note: bool = False, 
+    sort: tuple[str, str] | None = None
+) -> None:
     """
-    Run a SQL query and display the results, optionally hiding the 'note' column,
-    converting 'rating' to int, and sorting by a column.
+    Run a SQL query and display the results. 
+    
+    Supports optional parameterized queries, hiding the 'note' column, 
+    converting 'rating' to int, and sorting by a specified column.
 
     Args:
-        cur: SQLite cursor object
-        query: SQL query string to execute
-        note: Show the 'note' column if True; hide if False
-        sort: Tuple (column_name, order) to sort results.
-              order can be 'asc', 'a', '+', 'desc', 'd', '-'
+        cur: SQLite cursor object.
+        query: SQL query string to run.
+        parameters: Optional tuple of parameters for a parameterized SQL query.
+        note: If True, include the 'note' column in the output. If False, hide it.
+        sort: Optional tuple (column_name, order) specifying a sorting instruction.
+              Order can be one of: 'asc', 'a', '+', 'desc', 'd', '-'.
     """
     from utils.cli import print_rows
     from utils.db import fetch_rows
 
-    rows, column_names = fetch_rows(cur, query)
+    if parameters:
+        rows, column_names = fetch_rows(cur, query, parameters)
+    else:
+        rows, column_names = fetch_rows(cur, query)
+
     rows = [list(row) for row in rows]  # convert tuple to list
 
     # Convert rating to int if present
