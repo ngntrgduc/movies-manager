@@ -294,12 +294,33 @@ def sql(filename, note, sort, verbose):
 @click.option('--note', help='Show notes', is_flag=True)
 def recent(number, note):
     """
-    List recently watched movies.
+    Show recently watched movies.
     
     NUMBER  Number of movies to show (default: 10)
     """
     sql_folder = Path('sql/')
     sql_path = sql_folder / 'command' / 'recent.sql'
+    if not sql_path.exists():
+        print(f"SQL file '{sql_path}' not found.")
+        return
+
+    query = sql_path.read_text()
+
+    from utils.sql import run_sql
+    cur = CON.cursor()
+    run_sql(cur, query, parameters=(number,), note=note)
+
+@cli.command()
+@click.argument('number', type=int, required=False, default=10)
+@click.option('--note', help='Show notes', is_flag=True)
+def latest(number, note):
+    """
+    Show latest added movies.
+    
+    NUMBER  Number of movies to show (default: 10)
+    """
+    sql_folder = Path('sql/')
+    sql_path = sql_folder / 'command' / 'latest.sql'
     if not sql_path.exists():
         print(f"SQL file '{sql_path}' not found.")
         return
