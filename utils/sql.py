@@ -148,5 +148,8 @@ def run_sql(
                 reverse=descending
             )
 
-    print_rows(rows, column_names)
-    print(f'Total: {len(rows)}')
+    if len(rows) > 0:
+        print_rows(rows, column_names)
+        print(f'Total: {len(rows)}')
+    else:
+        print('No data.')
