@@ -298,15 +298,9 @@ def recent(number, note):
     
     NUMBER  Number of movies to show (default: 10)
     """
-    sql_folder = Path('sql/')
-    sql_path = sql_folder / 'command' / 'recent.sql'
-    if not sql_path.exists():
-        print(f"SQL file '{sql_path}' not found.")
-        return
-
-    query = sql_path.read_text()
-
     from utils.sql import run_sql
+
+    query = Path('sql/command/recent.sql').read_text()
     cur = CON.cursor()
     run_sql(cur, query, parameters=(number,), note=note)
 
@@ -319,15 +313,9 @@ def latest(number, note):
     
     NUMBER  Number of movies to show (default: 10)
     """
-    sql_folder = Path('sql/')
-    sql_path = sql_folder / 'command' / 'latest.sql'
-    if not sql_path.exists():
-        print(f"SQL file '{sql_path}' not found.")
-        return
-
-    query = sql_path.read_text()
-
     from utils.sql import run_sql
+
+    query = Path('sql/command/latest.sql').read_text()
     cur = CON.cursor()
     run_sql(cur, query, parameters=(number,), note=note)
 
@@ -341,13 +329,13 @@ def search(keyword, note):
 
     Default searches in 'name'. Use --note to search in 'note' and display it.
     """
+    from utils.sql import run_sql
 
     if note:
         query = "SELECT * FROM movie_detail WHERE note LIKE '%' || ? || '%'"
     else:
         query = "SELECT * FROM movie_detail WHERE name LIKE '%' || ? || '%'"
 
-    from utils.sql import run_sql
     cur = CON.cursor()
     run_sql(cur, query, parameters=(keyword,), note=note)
 
