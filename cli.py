@@ -339,6 +339,44 @@ def search(keyword, note):
     cur = CON.cursor()
     run_sql(cur, query, parameters=(keyword,), note=note)
 
+@cli.command()
+@timing
+def optimize():
+    """
+    Optimize the SQLite database using VACUUM.
+    Reclaims space, defragments pages, and rebuilds indexes.
+    """
+    def get_db_size() -> int:
+        return DB_FILE.stat().st_size
+
+    def convert_bytes(num: int) -> str:
+        """Convert bytes to KB, MB, GB, TB."""
+        for size in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+            if num < 1024:
+                return f'{num:.1f} {size}'
+            num /= 1024
+
+    before = get_db_size()
+
+    cur = CON.cursor()
+    print('Optimizing database...')
+    try:
+        print('Running VACUUM...')
+        cur.execute('VACUUM')
+    except Exception as e:
+        print(f'[red]Error during VACUUM:[/red] {e}')
+        return
+
+    after = get_db_size()
+    reduction = before - after
+    percent = (reduction / before * 100)
+    print(
+        f'VACUUM completed. Size reduced from {convert_bytes(before)} to {convert_bytes(after)}'
+        f' ({convert_bytes(reduction)}, {percent:.1f}% reduction).'
+    )
+    print('Database optimized successfully.')
+
+
 if __name__ == '__main__':
     try:
         cli()
