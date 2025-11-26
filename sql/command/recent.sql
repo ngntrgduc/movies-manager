@@ -1,4 +1,4 @@
--- List 10 recent watched
+-- List recently watched
 SELECT * FROM (
     SELECT * FROM movie_detail 
     WHERE status in ('completed', 'dropped')
