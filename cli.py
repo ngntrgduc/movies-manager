@@ -112,6 +112,9 @@ def filter(
         name, year, status, movie_type, country, genres, rating, watched_year, note_contains
     )
 
+    # Show note if note_contains is given
+    note = True if note_contains else note
+
     # Handle sort order for specific column
     if sort:
         sort_orders = {
