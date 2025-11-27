@@ -386,17 +386,9 @@ def optimize():
     Optimize the SQLite database using VACUUM.
     Reclaims space, defragments pages, and rebuilds indexes.
     """
-    def get_db_size() -> int:
-        return DB_FILE.stat().st_size
+    from utils.file import get_file_size, convert_bytes
 
-    def convert_bytes(num: int) -> str:
-        """Convert bytes to KB, MB, GB, TB."""
-        for size in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-            if num < 1024:
-                return f'{num:.1f} {size}'
-            num /= 1024
-
-    before = get_db_size()
+    before = get_file_size(DB_FILE)
 
     cur = CON.cursor()
     print('Optimizing database...')
@@ -407,7 +399,7 @@ def optimize():
         print(f'[red]Error during VACUUM:[/red] {e}')
         return
 
-    after = get_db_size()
+    after = get_file_size(DB_FILE)
     reduction = before - after
     percent = (reduction / before * 100)
     print(
