@@ -108,6 +108,7 @@ def run_sql(
     """
     from utils.cli import print_rows
     from utils.db import fetch_rows
+    from rich import print
 
     if parameters:
         rows, column_names = fetch_rows(cur, query, parameters)
