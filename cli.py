@@ -97,8 +97,10 @@ def filter(
         if rating:
             clause.append('rating = ?')
             parameters.append(rating)
-        if watched_year:
-            clause.append('substr(watched_date, 3, 2) = ?')
+        if watched_year:            
+            # Handle both full year and abbreviated year matching
+            year_length = len(str(watched_year))
+            clause.append(f'substr(watched_date, {4 - year_length + 1}, {year_length}) = ?')
             parameters.append(watched_year)
         if note_contains:
             clause.append('note LIKE ?')
