@@ -32,13 +32,12 @@ def cli():
 @click.option('-r', '--rating', type=click.IntRange(1, 10, clamp=True), help='Filter by rating')
 @click.option('-w', '--watched-year', help='Filter by watched year')
 @click.option('-nc', '--note-contains', help='Filter by substring in note (case-insensitive)')
-@click.option('--sort', help='Sort result by year or rating or watched date')
-@click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
+@click.option('--sort', help='Sort result by column')
 @click.option('--note', help='Show notes', is_flag=True)
 @timing
 def filter(
-    name, year, status, movie_type, country, genres, rating, watched_year, sort, 
-    stats, note, note_contains
+    name, year, status, movie_type, country, genres, rating, watched_year, 
+    sort, note, note_contains
 ):
     """Filter movies by attributes."""
 
@@ -48,56 +47,94 @@ def filter(
     if not has_filter:
         print('No filters specified. Use --help to see available options.')
         return
-
-    from utils.cli import resolve_choice, apply_filters
-
-    df = load_movies(CON, with_index=False)
-    # For table displaying purpose
-    df['year'] = df['year'].astype('Int64')
-    df['rating'] = df['rating'].astype('Int64')
-
-    filtered_df = apply_filters(
-        df, name, year, status, movie_type, country, genres, rating, watched_year, note_contains
-    )
     
-    if not note:
-        filtered_df = filtered_df.drop('note', axis=1)
+    from utils.cli import resolve_choice
 
-    sort = sort.strip() if sort else None
+    cur = CON.cursor()
+
+    def get_filter_query(
+        name, year, status, movie_type, country, genres, rating, watched_year, note_contains
+    ) -> tuple[str, list]:
+        """Build a parameterized SQL query for filtering movies."""
+
+        clause = []
+        parameters = []
+        if name:
+            clause.append('name LIKE ?')
+            parameters.append(f'%{name}%')
+        if year:
+            clause.append('year = ?')
+            parameters.append(year)
+        if status:
+            clause.append('status = ?')
+            parameters.append(resolve_choice(status, ['waiting', 'completed', 'dropped']))
+        if movie_type:
+            clause.append('type = ?')
+            parameters.append(resolve_choice(movie_type, ['movie', 'series']))
+        if country:
+            clause.append('country = ?')
+            parameters.append(resolve_choice(country, ['China', 'Japan', 'Korea', 'US']))
+        if genres:
+            from utils.format import format_genres
+            from utils.movie import get_genres
+
+            all_genres = get_genres(cur)
+            resolved_genres = []
+
+            # Prefix match user input to full genre names
+            # Example: "com" → "comedy" (but not "dark comedy")
+            # This prevents LIKE '%com%' from matching wrong genres.
+            for filter_genre in format_genres(genres):
+                for genre in all_genres:
+                    if genre.startswith(filter_genre):
+                        resolved_genres.append(genre)
+                        break
+            
+            # Exact genre match using comma-delimited boundaries
+            for resolved_genre in resolved_genres:
+                clause.append("',' || genres || ',' LIKE ?")
+                parameters.append(f'%,{resolved_genre},%')
+        if rating:
+            clause.append('rating = ?')
+            parameters.append(rating)
+        if watched_year:
+            clause.append('substr(watched_date, 3, 2) = ?')
+            parameters.append(watched_year)
+        if note_contains:
+            clause.append('note LIKE ?')
+            parameters.append(f'%{note_contains}%')
+        
+        where_clause = 'WHERE ' + ' AND '.join(clause)
+        query = 'SELECT * FROM movie_detail ' + where_clause
+        return query, parameters
+
+    query, parameters = get_filter_query(
+        name, year, status, movie_type, country, genres, rating, watched_year, note_contains
+    )
+
+    # Handle sort order for specific column
     if sort:
-        try: 
-            descending_columns = ['rating']
-            excluded_columns = ['genres', 'note']
-            sortable_columns = [col for col in filtered_df.columns 
-                                if col not in excluded_columns]
-            resolved = resolve_choice(sort, sortable_columns, strict=True)
-            ascending = resolved not in descending_columns
-            filtered_df = filtered_df.sort_values(by=[resolved], ascending=ascending)
+        sort_orders = {
+            'id': 'asc',
+            'name': 'asc',
+            'year': 'asc',
+            'status': 'asc',
+            'type': 'asc',
+            'country': 'asc',
+            # 'genres' - genres sorting is not intuitive
+            'rating': 'desc',
+            'watched_date': 'asc',
+            # 'note' is conflict with 'name' abbreviation, also not intuitive
+        }
+
+        try:
+            sort_order = resolve_choice(sort, list(sort_orders.keys()), strict=True)
+            sort = (sort_order, sort_orders[sort_order])
         except ValueError as e:
             raise click.BadParameter(str(e))
 
-    if filtered_df.empty:
-        print('No data.')
-        return
-
-    from utils.cli import print_df
-    
-    def print_stats(df, excluded: list = []) -> None:
-        """Print DataFrame statistics."""
-        for col in ['status', 'type', 'country']:
-            if col in excluded:
-                continue
-
-            print(col.capitalize())
-            for value, count in df[col].value_counts().items():
-                print(f' - {value}: {count}')
-
-    print_df(filtered_df)
-    print(f'Total: {filtered_df.shape[0]}')
-    if stats:
-        option_to_col = {'status': status, 'type': movie_type, 'country': country}
-        excluded = [col for col, val in option_to_col.items() if val]
-        print_stats(filtered_df, excluded)
+    from utils.sql import run_sql
+    run_sql(cur, query, parameters=parameters, note=note, sort=sort)
 
 @cli.command()
 @click.argument('movie_id', type=int)
