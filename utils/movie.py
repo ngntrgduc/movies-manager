@@ -91,7 +91,21 @@ def get_movie(movie_id: int, cur: sqlite3.Cursor) -> tuple | None:
     return cur.fetchone()
 
 def get_countries(cur: sqlite3.Cursor) -> list[str]:
-    """Return a list of all countries in the database using SQL."""
-    cur.execute('SELECT DISTINCT country FROM movie ORDER BY country')
-    countries = cur.fetchall()
-    return [country for (country,) in countries if country is not None]
+    """Return a list of all countries in the database.""" 
+    cur.execute('SELECT DISTINCT country FROM movie WHERE country IS NOT NULL ORDER BY country')
+    return [country for (country,) in cur.fetchall()]
+
+def get_statuses(cur: sqlite3.Cursor) -> list[str]:
+    """Return a list of all statuses in the database."""
+    cur.execute('SELECT DISTINCT status FROM movie ORDER BY status')
+    return [status for (status,) in cur.fetchall()]
+
+def get_types(cur: sqlite3.Cursor) -> list[str]:
+    """Return a list of all movie types in the database."""
+    cur.execute('SELECT DISTINCT type FROM movie')
+    return [movie_type for (movie_type,) in cur.fetchall()]
+
+def get_genres(cur: sqlite3.Cursor) -> list[str]:
+    """Return a list of all genres in the database.""" 
+    cur.execute('SELECT name FROM genre')
+    return [genre for (genre,) in cur.fetchall()]
