@@ -151,7 +151,7 @@ def filter(
     # Hide rating and watched_date column when status is 'waiting'
     hide_columns = ['rating', 'watched_date'] if status == 'waiting' else []
     rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
-    print_rows(rows, column_names, hide_columns=hide_columns)
+    print_rows(rows, column_names, hide_columns=hide_columns, print_total=True)
 
 @cli.command()
 @click.argument('movie_id', type=int)
