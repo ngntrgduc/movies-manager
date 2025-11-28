@@ -52,6 +52,10 @@ def filter(
 
     cur = CON.cursor()
 
+    status = resolve_choice(status, ['waiting', 'completed', 'dropped'])
+    movie_type = resolve_choice(movie_type, ['movie', 'series'])
+    country = resolve_choice(country, ['China', 'Japan', 'Korea', 'US'])
+
     def get_filter_query(
         name, year, status, movie_type, country, genres, rating, watched_year, note_contains
     ) -> tuple[str, list]:
@@ -67,13 +71,13 @@ def filter(
             parameters.append(year)
         if status:
             clause.append('status = ?')
-            parameters.append(resolve_choice(status, ['waiting', 'completed', 'dropped']))
+            parameters.append(status)
         if movie_type:
             clause.append('type = ?')
-            parameters.append(resolve_choice(movie_type, ['movie', 'series']))
+            parameters.append(movie_type)
         if country:
             clause.append('country = ?')
-            parameters.append(resolve_choice(country, ['China', 'Japan', 'Korea', 'US']))
+            parameters.append(country)
         if genres:
             from utils.format import format_genres
             from utils.movie import get_genres
