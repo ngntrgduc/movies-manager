@@ -139,7 +139,10 @@ def filter(
             raise click.BadParameter(str(e))
 
     from utils.sql import run_sql
-    run_sql(cur, query, parameters=parameters, note=note, sort=sort)
+    from utils.cli import print_rows
+
+    rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
+    print_rows(rows, column_names)
 
 @cli.command()
 @click.argument('movie_id', type=int)
@@ -328,8 +331,11 @@ def sql(filename, note, sort, verbose):
         print(f'\n[dim]{query}[/dim]\n')
 
     from utils.sql import run_sql
+    from utils.cli import print_rows
+
     cur = CON.cursor()
-    run_sql(cur, query, note=note, sort=sort)
+    rows, column_names = run_sql(cur, query, note=note, sort=sort)
+    print_rows(rows, column_names)
 
 @cli.command()
 @click.argument('number', type=int, required=False, default=10)
@@ -341,10 +347,12 @@ def recent(number, note):
     NUMBER  Number of movies to show (default: 10)
     """
     from utils.sql import run_sql
+    from utils.cli import print_rows
 
     query = Path('sql/command/recent.sql').read_text()
     cur = CON.cursor()
-    run_sql(cur, query, parameters=(number,), note=note)
+    rows, column_names = run_sql(cur, query, parameters=(number,), note=note)
+    print_rows(rows, column_names)
 
 @cli.command()
 @click.argument('number', type=int, required=False, default=10)
@@ -356,10 +364,12 @@ def latest(number, note):
     NUMBER  Number of movies to show (default: 10)
     """
     from utils.sql import run_sql
+    from utils.cli import print_rows
 
     query = Path('sql/command/latest.sql').read_text()
     cur = CON.cursor()
-    run_sql(cur, query, parameters=(number,), note=note)
+    rows, column_names = run_sql(cur, query, parameters=(number,), note=note)
+    print_rows(rows, column_names)
 
 @cli.command()
 @click.argument('keyword', type=str)
@@ -372,6 +382,7 @@ def search(keyword, note):
     Default searches in 'name'. Use --note to search in 'note' and display it.
     """
     from utils.sql import run_sql
+    from utils.cli import print_rows
 
     if note:
         query = "SELECT * FROM movie_detail WHERE note LIKE '%' || ? || '%'"
@@ -379,7 +390,8 @@ def search(keyword, note):
         query = "SELECT * FROM movie_detail WHERE name LIKE '%' || ? || '%'"
 
     cur = CON.cursor()
-    run_sql(cur, query, parameters=(keyword,), note=note)
+    rows, column_names = run_sql(cur, query, parameters=(keyword,), note=note)
+    print_rows(rows, column_names)
 
 @cli.command()
 @timing

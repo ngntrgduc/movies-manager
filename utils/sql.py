@@ -91,9 +91,9 @@ def run_sql(
     parameters: tuple | None = None,
     note: bool = False, 
     sort: tuple[str, str] | None = None
-) -> None:
+) -> tuple[list[list], list[str]]:
     """
-    Run a SQL query and display the results. 
+    Run a SQL query, transform the resulting rows, return rows and column names.
     
     Supports optional parameterized queries, hiding the 'note' column, 
     converting 'rating' to int, and sorting by a specified column.
@@ -106,9 +106,7 @@ def run_sql(
         sort: Optional tuple (column_name, order) specifying a sorting instruction.
               Order can be one of: 'asc', 'a', '+', 'desc', 'd', '-'.
     """
-    from utils.cli import print_rows
     from utils.db import fetch_rows
-    from rich import print
 
     if parameters:
         rows, column_names = fetch_rows(cur, query, parameters)
@@ -149,8 +147,4 @@ def run_sql(
                 reverse=descending
             )
 
-    if len(rows) > 0:
-        print_rows(rows, column_names)
-        print(f'Total: {len(rows)}')
-    else:
-        print('No data.')
+    return rows, column_names

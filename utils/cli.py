@@ -84,6 +84,11 @@ def valid_date(date: str) -> str:
 
 def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None:
     """Display rows in a Rich table."""
+    
+    if len(rows) == 0:
+        print('No data.')
+        return
+
     from rich.console import Console
     from rich.table import Table
     
@@ -99,6 +104,7 @@ def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None
 
     console = Console()
     console.print(table)
+    console.print(f'Total: {len(rows)}')
 
 def print_sql_files(sql_files: list[str]) -> None:
     """Print a list of available SQL files."""
