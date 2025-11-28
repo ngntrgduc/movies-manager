@@ -120,7 +120,8 @@ def print_rows(
 
     console = Console()
     console.print(table)
-    console.print(f'Total: {len(rows)}')
+    if print_total:
+        console.print(f'Total: {len(rows)}')
 
 def print_sql_files(sql_files: list[str]) -> None:
     """Print a list of available SQL files."""
