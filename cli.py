@@ -51,10 +51,12 @@ def filter(
     from utils.cli import resolve_choice
 
     cur = CON.cursor()
-
-    status = resolve_choice(status, ['waiting', 'completed', 'dropped'])
-    movie_type = resolve_choice(movie_type, ['movie', 'series'])
-    country = resolve_choice(country, ['China', 'Japan', 'Korea', 'US'])
+    if status:
+        status = resolve_choice(status, ['waiting', 'completed', 'dropped'])
+    if movie_type:
+        movie_type = resolve_choice(movie_type, ['movie', 'series'])
+    if country:
+        country = resolve_choice(country, ['China', 'Japan', 'Korea', 'US'])
 
     def get_filter_query(
         name, year, status, movie_type, country, genres, rating, watched_year, note_contains
@@ -111,7 +113,8 @@ def filter(
             parameters.append(f'%{note_contains}%')
         
         where_clause = 'WHERE ' + ' AND '.join(clause)
-        query = 'SELECT * FROM movie_detail ' + where_clause
+        select_clause = 'SELECT * FROM movie_detail '
+        query = select_clause + where_clause
         return query, parameters
 
     query, parameters = get_filter_query(
