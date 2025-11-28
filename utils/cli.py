@@ -82,25 +82,6 @@ def valid_date(date: str) -> str:
         f"{date!r} does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
     )
 
-def print_df(df) -> None:
-    """Display a DataFrame in a Rich table."""
-    import pandas as pd
-    from rich.console import Console
-    from rich.table import Table
-
-    # Remove empty columns (e.g., rating, watched_date for 'waiting' status)
-    df = df.dropna(axis=1, how='all')
-
-    table = Table(show_header=True, header_style='bold blue')
-    for column in df.columns:
-        table.add_column(column)
-
-    for _, row in df.iterrows():
-        table.add_row(*[str(x) if pd.notna(x) else '' for x in row])
-
-    console = Console()
-    console.print(table)
-
 def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None:
     """Display rows in a Rich table."""
     from rich.console import Console
@@ -118,63 +99,6 @@ def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None
 
     console = Console()
     console.print(table)
-
-def apply_filters(
-    df, name=None, year=None, status=None, movie_type=None, 
-    country=None, genres=None, rating=None, watched_year=None, note_contains=None
-):
-    """Apply filters to the movie DataFrame."""
-    import pandas as pd
-
-    def filter_by_choice(series: pd.Series, value: str, choices: list[str]) -> pd.Series:
-        """Return a boolean mask for rows where the series matches a resolved choice."""
-        resolved = resolve_choice(value, choices)
-        if resolved:
-            return series == resolved
-        
-        return pd.Series(False, index=series.index)
-
-    mask = pd.Series(True, index=df.index)
-    if name:
-        mask &= df['name'].str.contains(name, case=False, na=False)
-    if year:
-        mask &= df['year'] == year
-    if watched_year:
-        mask &= df['watched_date'].str[:4].str.endswith(watched_year)
-    if status:
-        mask &= filter_by_choice(df['status'], status, ['waiting', 'completed', 'dropped'])
-    if movie_type:
-        mask &= filter_by_choice(df['type'], movie_type, ['movie', 'series'])
-    if country:
-        mask &= filter_by_choice(df['country'], country, ['China', 'Japan', 'Korea', 'US'])
-    if genres:
-        from utils.format import format_genres
-        genres = format_genres(genres)
-        genres_set = df['genres'].fillna('').apply(lambda g: format_genres(g, as_set=True))
-        set_mask = genres_set.apply(lambda g: set(genres).issubset(g))
-        if set_mask.any():
-            mask &= set_mask
-        else:
-            # Fallback fuzzy matching using substring search
-            def fuzzy_match(row: str) -> bool:
-                row_genres = format_genres(row)
-                return all(
-                    any(search_genre in genre for genre in row_genres)
-                    for search_genre in genres
-                )
-
-            fuzzy_mask = df['genres'].fillna('').apply(fuzzy_match)
-            mask &= fuzzy_mask
-    if rating:
-        mask &= df['rating'] == rating
-    if note_contains:
-        mask &= df['note'].str.contains(note_contains, case=False, na=False)
-
-    # prevent showing all rows after filtering
-    if mask.all():
-        mask[:] = False
-
-    return df[mask]
 
 def print_sql_files(sql_files: list[str]) -> None:
     """Print a list of available SQL files."""
