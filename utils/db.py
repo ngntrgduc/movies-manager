@@ -1,5 +1,11 @@
 import sqlite3
 
+def get_connection(file_path: str = 'data/movies.db') -> sqlite3.Connection:
+    """Create and return a SQLite connection with foreign key support enabled."""
+    con = sqlite3.connect(file_path)
+    con.execute('PRAGMA foreign_keys = ON')  # enable foreign keys constraint and ON DELETE CASCADE
+    return con
+
 def fetch_scalar(cur: sqlite3.Cursor, query: str) -> int | float:
     """Run a SQL query and return its single scalar value."""
     return cur.execute(query).fetchone()[0]

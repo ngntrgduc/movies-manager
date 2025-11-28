@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.date import get_today, get_year
-from utils.movie import add_movie, get_connection, load_movies, get_countries
+from utils.movie import add_movie, load_movies, get_countries
+from utils.db import get_connection
 from utils.format import format_genres
 
 st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='centered')

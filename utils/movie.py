@@ -1,11 +1,5 @@
 import sqlite3
 
-def get_connection(file_path: str = 'data/movies.db') -> sqlite3.Connection:
-    """Create and return a SQLite connection with foreign key support enabled."""
-    con = sqlite3.connect(file_path)
-    con.execute('PRAGMA foreign_keys = ON')  # enable foreign keys constraint and ON DELETE CASCADE
-    return con
-
 def get_genre_id(name: str, cur: sqlite3.Cursor) -> int:
     """Get genre id by name."""
     cur.execute("SELECT id FROM genre WHERE name = ?", (name,))

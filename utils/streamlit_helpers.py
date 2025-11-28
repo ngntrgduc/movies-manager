@@ -3,7 +3,8 @@ import pandas as pd
 
 @st.cache_data
 def load_data_with_cache() -> pd.DataFrame:
-    from utils.movie import load_movies, get_connection
+    from utils.movie import load_movies
+    from utils.db import get_connection
     with get_connection() as con:
         return load_movies(con, with_index=True)
 

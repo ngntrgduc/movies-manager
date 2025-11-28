@@ -2,7 +2,8 @@ import click
 import sqlite3
 from rich import print
 from pathlib import Path
-from utils.movie import get_connection, load_movies
+from utils.movie import load_movies
+from utils.db import get_connection
 from utils.timing import timing
 
 DB_FILE = Path('data/movies.db')
