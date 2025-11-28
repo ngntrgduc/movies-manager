@@ -82,8 +82,14 @@ def valid_date(date: str) -> str:
         f"{date!r} does not match the formats 'YYYY', 'YYYY-MM', 'YYYY-MM-DD'"
     )
 
-def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None:
-    """Display rows in a Rich table."""
+def print_rows(
+    rows: list[tuple],
+    headers: list[str],
+    title: str = None,
+    hide_columns: list[str] | None = None,
+    print_total: bool = False,
+) -> None:
+    """Display rows in a Rich table with optional hidden columns."""
     
     if len(rows) == 0:
         print('No data.')
@@ -92,15 +98,25 @@ def print_rows(rows: list[tuple], headers: list[str], title: str = None) -> None
     from rich.console import Console
     from rich.table import Table
     
+    # Determine columns to display
+    hide_columns = hide_columns or []
+    filtered_headers = [h for h in headers if h not in hide_columns]
+    keep_indexes = [i for i, h in enumerate(headers) if h not in hide_columns]
+
     table = Table(
         title=title, title_justify='left', title_style='bold',
         show_header=True, header_style='bold blue'
     )
-    for header in headers:
+    for header in filtered_headers:
         table.add_column(header)
 
     for row in rows:
-        table.add_row(*[str(x) if x is not None else '' for x in row])
+        table.add_row(
+            *[
+                str(value) if (value := row[i]) is not None else '' 
+                for i in keep_indexes
+            ]
+        )
 
     console = Console()
     console.print(table)
