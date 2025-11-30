@@ -3,6 +3,7 @@ from utils.date import get_today, get_year
 from utils.movie import add_movie, load_movies, get_countries
 from utils.db import get_connection
 from utils.format import format_genres
+from utils.constants import MOVIE_TYPES, MOVIE_STATUSES, UNWATCHED_STATUS
 
 st.set_page_config(page_title = 'Add movie', page_icon=':heavy_plus_sign:', layout='centered')
 
@@ -12,7 +13,7 @@ def reset_form() -> None:
     default_settings = {
         'name': '',
         'year': None,
-        'status': 'waiting',
+        'status': UNWATCHED_STATUS,
         'type': 'movie',
         'country': None,
         'genres': '',
@@ -24,7 +25,10 @@ def reset_form() -> None:
         st.session_state[key] = val
 
 def update_watched_date() -> None:
-    st.session_state['watched_date'] = None if st.session_state['status'] == 'waiting' else get_today()
+    if st.session_state['status'] == UNWATCHED_STATUS:
+        st.session_state['watched_date'] = None
+    else:
+        st.session_state['watched_date'] = get_today()
 
 def add_to_db() -> None:
     name = st.session_state['name'].strip()
@@ -68,7 +72,7 @@ with container:
     year_bar.number_input(
         'Year', min_value=1900, max_value=get_year(get_today()), value=None, step=1, key='year'
     )
-    type_bar.selectbox('Type', options=['movie', 'series'], key='type')
+    type_bar.selectbox('Type', options=MOVIE_TYPES, key='type')
 
     country_bar, genres_bar = st.columns([1, 2])
     
@@ -83,12 +87,11 @@ with container:
     genres_bar.text_input('Genres (separated by comma)', key='genres')
 
     if 'status' not in st.session_state:
-        st.session_state['status'] = 'waiting'
+        st.session_state['status'] = UNWATCHED_STATUS
 
     status_bar, watched_year_bar, rating_bar = st.columns([2, 1, 1], vertical_alignment='center')
     status_bar.segmented_control(
-        'Status', ['waiting', 'completed' ,'dropped'], width='stretch',
-        key='status', on_change=update_watched_date
+        'Status', MOVIE_STATUSES, width='stretch', key='status', on_change=update_watched_date
     )
     watched_year_bar.text_input('Watched date', value=None, placeholder='YYYY-MM-DD', key='watched_date')
     rating_bar.number_input(

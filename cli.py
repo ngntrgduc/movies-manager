@@ -50,14 +50,15 @@ def filter(
         return
     
     from utils.cli import resolve_choice
+    from utils.constants import MOVIE_STATUSES, MOVIE_TYPES, COUNTRIES, UNWATCHED_STATUS
 
     cur = CON.cursor()
     if status:
-        status = resolve_choice(status, ['waiting', 'completed', 'dropped'])
+        status = resolve_choice(status, MOVIE_STATUSES)
     if movie_type:
-        movie_type = resolve_choice(movie_type, ['movie', 'series'])
+        movie_type = resolve_choice(movie_type, MOVIE_TYPES)
     if country:
-        country = resolve_choice(country, ['China', 'Japan', 'Korea', 'US'])
+        country = resolve_choice(country, COUNTRIES)
 
     def get_filter_query(
         name, year, status, movie_type, country, genres, rating, watched_year, note_contains
@@ -149,8 +150,8 @@ def filter(
     from utils.sql import run_sql
     from utils.cli import print_rows
 
-    # Hide rating and watched_date column when status is 'waiting'
-    hide_columns = ['rating', 'watched_date'] if status == 'waiting' else []
+    # Hide rating and watched_date column for unwatched movie
+    hide_columns = ['rating', 'watched_date'] if status == UNWATCHED_STATUS else []
     rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
     print_rows(rows, column_names, hide_columns=hide_columns, print_total=True)
 

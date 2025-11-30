@@ -2,6 +2,7 @@ import streamlit as st
 from utils.streamlit_helpers import load_data_with_cache, load_column_config
 from utils.db import get_connection
 from utils.movie import load_movies, add_movie, update_movie, delete_movie
+from utils.constants import UNWATCHED_STATUS
 
 st.set_page_config(page_title = 'Edit movies', page_icon=':pencil2:', layout='wide')
 
@@ -9,7 +10,7 @@ def get_default_values() -> dict:
     return {
         'name': '',
         'year': None,
-        'status': 'waiting',
+        'status': UNWATCHED_STATUS,
         'type': 'movie',
         'country': None,
         'genres': None,

@@ -19,7 +19,7 @@ selected_watched_year = watched_year_bar.selectbox(
     'Watched year', options=options['watched_year'], index=None
 )
 selected_status = status_bar.segmented_control(
-    'Status', options=['waiting', 'completed', 'dropped'], selection_mode='single', width='stretch'
+    'Status', options=options['status'], selection_mode='single', width='stretch'
 )
 if refresh_button.button('Refresh', width='content'):
     load_data_with_cache.clear()

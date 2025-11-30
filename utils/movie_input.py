@@ -2,6 +2,7 @@ import click
 from utils.cli import IntRangeOrNone, AbbrevChoice, valid_date
 from utils.date import get_current_year
 from utils.format import format_genres
+from utils.constants import MOVIE_STATUSES, MOVIE_TYPES, COUNTRIES, UNWATCHED_STATUS
 
 def prompt_add_movie() -> dict:
     """Prompt the user interactively to add a new movie and return the data as a dictionary."""
@@ -12,16 +13,12 @@ def prompt_add_movie() -> dict:
     year = click.prompt(
         'Year', type=IntRangeOrNone(1900, get_current_year()), **skippable_settings
     )
-    status = click.prompt(
-        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']), default='waiting'
-    )
-    movie_type = click.prompt('Type', type=AbbrevChoice(['movie', 'series']))
-    country = click.prompt(
-        'Country', type=AbbrevChoice(['China', 'Japan', 'Korea', 'US']), **skippable_settings
-    )
+    status = click.prompt('Status', type=AbbrevChoice(MOVIE_STATUSES), default=UNWATCHED_STATUS)
+    movie_type = click.prompt('Type', type=AbbrevChoice(MOVIE_TYPES))
+    country = click.prompt('Country', type=AbbrevChoice(COUNTRIES), **skippable_settings)
     genres = click.prompt('Genres (comma-separated)', value_proc=format_genres)
 
-    if status == 'waiting':
+    if status == UNWATCHED_STATUS:
         rating = None
         watched_date = None
     else:
@@ -65,22 +62,20 @@ def prompt_update_movie(existing_movie: dict) -> dict:
         **default_setting(existing_movie['year'])
     )
     movie['status'] = click.prompt(
-        'Status', type=AbbrevChoice(['waiting', 'completed', 'dropped']),
-        **default_setting(existing_movie['status'])
+        'Status', type=AbbrevChoice(MOVIE_STATUSES), **default_setting(existing_movie['status'])
     )
     movie['type'] = click.prompt(
-        'Type', type=AbbrevChoice(['movie', 'series']), **default_setting(existing_movie['type'])
+        'Type', type=AbbrevChoice(MOVIE_TYPES), **default_setting(existing_movie['type'])
     )
     movie['country'] = click.prompt(
-        'Country', type=AbbrevChoice(
-            ['China', 'Japan', 'Korea', 'US']), **default_setting(existing_movie['country'])
+        'Country', type=AbbrevChoice(COUNTRIES), **default_setting(existing_movie['country'])
     )
     movie['genres'] = click.prompt(
         'Genres (comma-separated)', value_proc=format_genres,
           **default_setting(existing_movie['genres'])
     )
 
-    if movie['status'] == 'waiting':
+    if movie['status'] == UNWATCHED_STATUS:
         movie['rating'] = None
         movie['watched_date'] = None
     else:
