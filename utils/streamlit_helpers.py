@@ -10,7 +10,7 @@ def load_data_with_cache() -> pd.DataFrame:
 
 @st.cache_data
 def get_options(df: pd.DataFrame) -> dict:
-    from .date import get_year
+    from utils.date import get_year
     return {
             'year': sorted(df['year'].dropna().astype(int).unique().tolist(), reverse=True),
             # 'status': ['waiting', 'completed' ,'dropped'],
