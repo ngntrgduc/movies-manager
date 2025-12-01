@@ -15,6 +15,11 @@ def get_file_size(file: str | Path) -> int:
 
     return file.stat().st_size
 
+def get_last_modified(file: Path) -> str:
+    """Return the last modified timestamp of a file."""
+    from datetime import datetime
+    return f'{datetime.fromtimestamp(file.stat().st_mtime):%Y-%m-%d %X}'
+
 # if __name__ == '__main__':
 #     data_folder = Path('data/')
 #     total = 0

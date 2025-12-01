@@ -278,11 +278,8 @@ def stats(verbose):
 @click.option('--csv', help='Back up to data/backup.csv for safer recovery', is_flag=True)
 def backup(csv):
     """Back up data."""
-    from datetime import datetime
-    print(f'Backup last modified: {
-        datetime.fromtimestamp(BACKUP_FILE.stat().st_mtime):%Y-%m-%d %X
-    }')
-
+    from utils.file import get_last_modified
+    print(f'Backup last modified: {get_last_modified(BACKUP_FILE)}')
     click.confirm(
         'This will overwrite the existing backup file. Continue?', abort=True, default=True
     )
@@ -306,11 +303,8 @@ def restore():
         print("Backup file not found. Run 'backup' first.")
         return
 
-    from datetime import datetime
-    print(f'Backup last modified: {
-        datetime.fromtimestamp(BACKUP_FILE.stat().st_mtime):%Y-%m-%d %X
-    }')
-
+    from utils.file import get_last_modified
+    print(f'Backup last modified: {get_last_modified(BACKUP_FILE)}')
     click.confirm(
         'This will replace your current movie database with the backup file. Continue?', abort=True
     )
