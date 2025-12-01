@@ -278,6 +278,15 @@ def stats(verbose):
 @click.option('--csv', help='Back up to data/backup.csv for safer recovery', is_flag=True)
 def backup(csv):
     """Back up data."""
+    from datetime import datetime
+    print(f'Backup last modified: {
+        datetime.fromtimestamp(BACKUP_FILE.stat().st_mtime):%Y-%m-%d %X
+    }')
+
+    click.confirm(
+        'This will overwrite the existing backup file. Continue?', abort=True, default=True
+    )
+
     try:
         with sqlite3.connect(BACKUP_FILE) as backup_con:
             CON.backup(backup_con)
