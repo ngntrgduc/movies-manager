@@ -346,7 +346,7 @@ def sql(filename, note, sort, verbose):
 
     cur = CON.cursor()
     rows, column_names = run_sql(cur, query, note=note, sort=sort)
-    print_rows(rows, column_names)
+    print_rows(rows, column_names, print_total=True)
 
 @cli.command()
 @click.argument('number', type=int, required=False, default=10)
