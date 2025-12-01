@@ -25,6 +25,8 @@ So I built this movie manager as a more convenient way to manage my movie collec
 ## ERD
 ![](/images/erd.png)
 
+For schema detail, see [schema.sql](/sql/schema.sql)
+
 ## A glimpse
 **Web interface**
 ![](/images/data.png)
@@ -43,13 +45,17 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - `rich.Table` is bad at handling clickable links, so it is recommended to view notes in the web app or using `get` command in CLI.
 - Adding multiline notes in CLI is limited, `click.prompt()` just accepts a single-line prompt string, use the web app instead.
 - The CLI `update` command is intended for editing existing field values, not for clearing them. To remove a field’s content, use the web app instead.
+- The CLI `add`/`update` command cannot add/update new country, use the web app instead.
 
 ## Recent updates
+- `v0.3.0` - Major CLI upgrades with new commands, SQL-based filtering, improved sorting, new utilities, and performance refinements
 - `v0.2.0` - Data stored in SQLite database instead of CSV, faster experience, CLI now has more functionality and can run SQL scripts
 - `v0.1.3` - Added backup/restore, rating filter, and refinements to CLI
 - `v0.1.2` - Improved CLI
 - `v0.1.1` - Added small CLI
 - `v0.1.0` - Data stored in a CSV file
+
+See full details in the [CHANGELOG](/CHANGELOG.md).
 
 ## Usage
 - Install [uv](https://docs.astral.sh/uv/) (recommended for package management)
@@ -62,7 +68,7 @@ uv venv
 ```
 uv sync
 ```
-- Or sync dependencies with CLI support
+- Or sync dependencies with CLI support (recommended)
 ```
 uv sync --extra cli
 ```
@@ -83,15 +89,19 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  add      Add a new movie interactively.
-  backup   Back up data.
-  delete   Delete a movie by id.
-  filter   Filter movies by attributes.
-  get      Get information of a movie by id.
-  restore  Restore data from backup.
-  sql      Run a SQL file from the 'sql/' folder.
-  stats    Show statistics for the movie data.
-  update   Update a movie interactively by id.
+  add       Add a new movie interactively.
+  backup    Back up data.
+  delete    Delete a movie by id.
+  filter    Filter movies by attributes.
+  get       Get information of a movie by id.
+  latest    Show latest added movies.
+  optimize  Optimize the SQLite database using VACUUM.
+  recent    Show recently watched movies.
+  restore   Restore data from backup.
+  search    Search movies by keyword.
+  sql       Run a SQL file from the 'sql/' folder.
+  stats     Show statistics for the movie data.
+  update    Update a movie interactively by id.
 ```
 
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.
