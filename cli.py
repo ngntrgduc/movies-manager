@@ -35,10 +35,11 @@ def cli():
 @click.option('-nc', '--note-contains', help='Filter by substring in note (case-insensitive)')
 @click.option('--sort', help='Sort result by column')
 @click.option('--note', help='Show notes', is_flag=True)
+@click.option('--clean', help='Hide filtered column', is_flag=True)
 @timing
 def filter(
-    name, year, status, movie_type, country, genres, rating, watched_year, 
-    sort, note, note_contains
+    name, year, status, movie_type, country, genres, rating, watched_year, note_contains,
+    sort, note, clean
 ):
     """Filter movies by attributes."""
 
@@ -152,6 +153,16 @@ def filter(
 
     # Hide rating and watched_date column for unwatched movie
     hide_columns = ['rating', 'watched_date'] if status == UNWATCHED_STATUS else []
+
+    # Hide filtered column
+    if clean:
+        if status:
+            hide_columns.append('status')
+        if movie_type:
+            hide_columns.append('type')
+        if country:
+            hide_columns.append('country')
+
     rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
     print_rows(rows, column_names, hide_columns=hide_columns, print_total=True)
 
