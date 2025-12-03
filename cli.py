@@ -201,7 +201,8 @@ def add():
 
 @cli.command()
 @click.argument('movie_id', type=int)
-def update(movie_id: int):
+@click.option('-n', '--note', help='Only update note', is_flag=True)
+def update(movie_id, note):
     """Update a movie interactively by id."""
     from utils.movie import get_movie, update_movie
     from utils.movie_input import prompt_update_movie
@@ -218,7 +219,7 @@ def update(movie_id: int):
     print(existing_movie)
     existing_movie.pop('id')
 
-    updated_data = prompt_update_movie(existing_movie)
+    updated_data = prompt_update_movie(existing_movie, just_note=note)
     print(updated_data)
 
     update_movie(movie_id, updated_data, cur)

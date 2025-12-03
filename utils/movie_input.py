@@ -43,7 +43,7 @@ def prompt_add_movie() -> dict:
         'note': note
     }
 
-def prompt_update_movie(existing_movie: dict) -> dict:
+def prompt_update_movie(existing_movie: dict, just_note: bool = False) -> dict:
     """Prompt the user interactively for fields to update, return only changed fields."""
 
     def default_setting(default_value: str | int | float | None) -> dict:
@@ -56,37 +56,40 @@ def prompt_update_movie(existing_movie: dict) -> dict:
 
     movie = {}
     print('Press Enter to keep old value')
-    movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
-    movie['year'] = click.prompt(
-        'Year', type=IntRangeOrNone(1900, get_current_year()),
-        **default_setting(existing_movie['year'])
-    )
-    movie['status'] = click.prompt(
-        'Status', type=AbbrevChoice(MOVIE_STATUSES), **default_setting(existing_movie['status'])
-    )
-    movie['type'] = click.prompt(
-        'Type', type=AbbrevChoice(MOVIE_TYPES), **default_setting(existing_movie['type'])
-    )
-    movie['country'] = click.prompt(
-        'Country', type=AbbrevChoice(COUNTRIES), **default_setting(existing_movie['country'])
-    )
-    movie['genres'] = click.prompt(
-        'Genres (comma-separated)', value_proc=format_genres,
-          **default_setting(existing_movie['genres'])
-    )
 
-    if movie['status'] == UNWATCHED_STATUS:
-        movie['rating'] = None
-        movie['watched_date'] = None
-    else:
-        movie['rating'] = click.prompt(
-            'Rating', type=IntRangeOrNone(1, 10, clamp=True),
-            **default_setting(existing_movie['rating'])
+    if not just_note:
+        movie['name'] = click.prompt('Name', **default_setting(existing_movie['name'])).strip()
+        movie['year'] = click.prompt(
+            'Year', type=IntRangeOrNone(1900, get_current_year()),
+            **default_setting(existing_movie['year'])
         )
-        watched_date = click.prompt(
-            'Watched date', value_proc=valid_date, **default_setting(existing_movie['watched_date'])
+        movie['status'] = click.prompt(
+            'Status', type=AbbrevChoice(MOVIE_STATUSES), **default_setting(existing_movie['status'])
         )
-        movie['watched_date'] = watched_date if watched_date else None
+        movie['type'] = click.prompt(
+            'Type', type=AbbrevChoice(MOVIE_TYPES), **default_setting(existing_movie['type'])
+        )
+        movie['country'] = click.prompt(
+            'Country', type=AbbrevChoice(COUNTRIES), **default_setting(existing_movie['country'])
+        )
+        movie['genres'] = click.prompt(
+            'Genres (comma-separated)', value_proc=format_genres,
+            **default_setting(existing_movie['genres'])
+        )
+
+        if movie['status'] == UNWATCHED_STATUS:
+            movie['rating'] = None
+            movie['watched_date'] = None
+        else:
+            movie['rating'] = click.prompt(
+                'Rating', type=IntRangeOrNone(1, 10, clamp=True),
+                **default_setting(existing_movie['rating'])
+            )
+            watched_date = click.prompt(
+                'Watched date', value_proc=valid_date,
+                **default_setting(existing_movie['watched_date'])
+            )
+            movie['watched_date'] = watched_date if watched_date else None
 
     note = click.prompt('Note', **default_setting(existing_movie['note'])).strip()
     movie['note'] = note if note else None
