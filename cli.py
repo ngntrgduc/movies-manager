@@ -155,27 +155,21 @@ def filter(
     # Hide rating and watched_date column for unwatched movie
     hide_columns = ['rating', 'watched_date'] if status == UNWATCHED_STATUS else []
 
+    filter_values = {'status': status, 'type': movie_type, 'country': country}
+    filtered_columns = [col for col, value in filter_values.items() if value]
+
     # Hide filtered column
     if clean:
-        if status:
-            hide_columns.append('status')
-        if movie_type:
-            hide_columns.append('type')
-        if country:
-            hide_columns.append('country')
+        hide_columns.extend(filtered_columns)
 
     rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
     print_rows(rows, column_names, hide_columns=hide_columns, print_total=True)
 
-
     if stats:
         from collections import Counter
 
-        option_to_col = {'status': status, 'type': movie_type, 'country': country}
-        excluded = [col for col, value in option_to_col.items() if value]
-
         for col in ['status', 'type', 'country']:
-            if col in excluded:
+            if col in filtered_columns:
                 continue
 
             print(col.capitalize())
