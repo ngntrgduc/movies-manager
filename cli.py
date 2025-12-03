@@ -36,10 +36,11 @@ def cli():
 @click.option('--sort', help='Sort result by column')
 @click.option('--note', help='Show notes', is_flag=True)
 @click.option('--clean', help='Hide filtered column', is_flag=True)
+@click.option('--stats', help='Show statistics for the filtered results', is_flag=True)
 @timing
 def filter(
     name, year, status, movie_type, country, genres, rating, watched_year, note_contains,
-    sort, note, clean
+    sort, note, clean, stats
 ):
     """Filter movies by attributes."""
 
@@ -165,6 +166,23 @@ def filter(
 
     rows, column_names = run_sql(cur, query, parameters=parameters, note=note, sort=sort)
     print_rows(rows, column_names, hide_columns=hide_columns, print_total=True)
+
+
+    if stats:
+        from collections import Counter
+
+        option_to_col = {'status': status, 'type': movie_type, 'country': country}
+        excluded = [col for col, value in option_to_col.items() if value]
+
+        for col in ['status', 'type', 'country']:
+            if col in excluded:
+                continue
+
+            print(col.capitalize())
+            col_idx = column_names.index(col)
+            c = Counter([row[col_idx] for row in rows])
+            for value, count in c.items():
+                print(f' - {value}: {count}')
 
 @cli.command()
 @click.argument('movie_id', type=int)
