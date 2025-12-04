@@ -302,19 +302,26 @@ def stats(verbose):
 @click.option('--csv', help='Back up to data/backup.csv for safer recovery', is_flag=True)
 def backup(csv):
     """Back up data."""
+    from utils.db import fetch_rows_count
     from utils.file import get_last_modified
-    print(f'Backup last modified: {get_last_modified(BACKUP_FILE)}')
-    click.confirm(
-        'This will overwrite the existing backup file. Continue?', abort=True, default=True
-    )
+
+    print(f'Database rows: {fetch_rows_count(CON)}')
 
     try:
         with sqlite3.connect(BACKUP_FILE) as backup_con:
+            print(f'Backup rows: {fetch_rows_count(backup_con)}')
+            print(f'Backup last modified: {get_last_modified(BACKUP_FILE)}')
+            click.confirm(
+                'This will overwrite the existing backup file. Continue?', abort=True, default=True
+            )
+
             CON.backup(backup_con)
         if csv:
             df = load_movies(CON, with_index=True)
             df.to_csv('data/backup.csv', index=False)
         print('Backup successful.')
+    except click.Abort:
+        print('Aborted!')
     except Exception as e:
         print(f'Backup failed: {e}')
 
