@@ -271,13 +271,13 @@ def delete(movie_id: int):
 def stats(verbose):
     """Show statistics for the movie data."""
     from utils.cli import print_rows
-    from utils.db import fetch_scalar, fetch_rows
+    from utils.db import fetch_scalar, fetch_rows, fetch_rows_count
 
     cur = CON.cursor()
 
-    total = fetch_scalar(cur, 'SELECT COUNT(*) FROM movie')
+    total = fetch_rows_count(cur)
     avg_rating = fetch_scalar(cur, 'SELECT ROUND(AVG(rating), 2) FROM movie')
-    genres_count = fetch_scalar(cur, 'SELECT COUNT(*) FROM genre')
+    genres_count = fetch_rows_count(cur, 'genre')
     print(f'Total: {total}')
     print(f'Average rating: {avg_rating}')
     print(f'Genres count: {genres_count}')

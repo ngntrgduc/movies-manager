@@ -22,3 +22,7 @@ def fetch_rows(
     rows = cur.fetchall()
     column_names = [d[0] for d in cur.description]
     return rows, column_names
+
+def fetch_rows_count(cur: sqlite3.Cursor, table: str = 'movie') -> int:
+    """Return the number of rows in the specified table."""
+    return fetch_scalar(cur, f'SELECT COUNT(*) FROM {table}')
