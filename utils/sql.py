@@ -1,4 +1,5 @@
 from pathlib import Path
+from utils.fuzzy import get_fuzzy_match
 
 def list_sql_files(sql_folder: Path) -> list[str]:
     """Return a list of all SQL files in the 'sql/' folder."""
@@ -7,12 +8,6 @@ def list_sql_files(sql_folder: Path) -> list[str]:
         f.stem for f in sql_folder.glob('*.sql')
         if f.name not in excluded
     ]
-
-def get_fuzzy_match(value: str, choices: list[str], n: int = 1) -> str | None:
-        """Return the closest fuzzy match to `value` among `choices`."""
-        from difflib import get_close_matches
-        matches = get_close_matches(value, choices, n=n)
-        return matches[0] if matches else None
 
 def resolve_sql_path(
     filename: str, sql_folder: Path, sql_files: list[str]
