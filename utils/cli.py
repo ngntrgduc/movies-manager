@@ -67,6 +67,41 @@ class AbbrevChoice(click.Choice):
         except ValueError as e:
             self.fail(str(e), param, ctx)
 
+class AliasedGroup(click.Group):
+    # Source: https://click.palletsprojects.com/en/stable/extending-click/#command-aliases
+    def get_command(self, ctx, cmd_name):
+        rv = super().get_command(ctx, cmd_name)
+
+        if rv is not None:
+            return rv
+
+        commands_list = self.list_commands(ctx)
+        matches = [
+            x for x in commands_list
+            if x.startswith(cmd_name)
+        ]
+
+        if not matches:
+            from utils.fuzzy import get_fuzzy_match
+            fuzzy_match = get_fuzzy_match(cmd_name, commands_list)
+            if fuzzy_match:
+                print(f'Fuzzy match: {fuzzy_match}')
+                return click.Group.get_command(self, ctx, fuzzy_match)
+
+            return None
+
+        if len(matches) == 1:
+            prefix_match = matches[0]
+            print(f'Prefix match: {prefix_match}')
+            return click.Group.get_command(self, ctx, prefix_match)
+
+        ctx.fail(f"Too many matches: {', '.join(sorted(matches))}")
+
+    def resolve_command(self, ctx, args):
+        # always return the full command name
+        _, cmd, args = super().resolve_command(ctx, args)
+        return cmd.name, cmd, args
+
 def valid_date(date: str) -> str:
     from datetime import datetime
     if date.strip() == '':

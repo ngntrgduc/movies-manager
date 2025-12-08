@@ -5,6 +5,7 @@ from pathlib import Path
 from utils.movie import load_movies
 from utils.db import get_connection
 from utils.timing import timing
+from utils.cli import AliasedGroup
 
 DB_FILE = Path('data/movies.db')
 BACKUP_FILE = Path('data/backup.db')
@@ -17,7 +18,7 @@ def update_csv() -> None:
 
 # changes the default parameters to -h and --help instead of just --help
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-@click.group(context_settings=CONTEXT_SETTINGS, no_args_is_help=True)
+@click.group(cls=AliasedGroup, context_settings=CONTEXT_SETTINGS, no_args_is_help=True)
 def cli():
     """Command-line tool to manage, filter, and analyze your movie collection."""
     pass
