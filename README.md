@@ -8,16 +8,18 @@ So I built this movie manager as a more convenient way to manage my movie collec
 - Full CRUD support
 - Track essential metadata: `name`, `year`, `status`, `type`, `country`, `genres`, `rating`, `watched_date`, `note`
 - Interactive dashboard with Power BI (Streamlit charts are limited and less interactive compared to Power BI)
-- CLI to add, filter, and analyze movie data.
+- CLI to add, filter, and analyze movie data
   - Fast CLI experience by lazy importing
   - Run SQL script in `sql/` folder, provide flexibility and customization
-- Backup and Restore functionality
+- Backup and Restore functionality (CLI)
+- Testing functionalities
 
 ## Tech stack
 - Web UI: Streamlit
 - Database: SQLite + CSV file (for Power BI dashboard)
 - Visualization: Power BI
 - CLI: Click + Rich
+- Testing: Pytest
 
 ## Architecture
 ![](images/architecture.png)
@@ -66,7 +68,7 @@ uv venv
 - Activate the virtual environment
 - Sync dependencies
 ```
-uv sync
+uv sync --no-dev
 ```
 - Or sync dependencies with CLI support (recommended)
 ```
@@ -102,6 +104,17 @@ Commands:
   sql       Run a SQL file from the 'sql/' folder.
   stats     Show statistics for the movie data.
   update    Update a movie interactively by id.
+```
+
+## Development
+- Install development dependencies (testing)
+```
+uv sync --dev
+```
+
+- Run tests
+```
+uv run pytest
 ```
 
 #### Happy watching 😄. But remember that movies are also a form of escapism 😢.
