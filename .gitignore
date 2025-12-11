@@ -1,9 +1,10 @@
 .venv
 __pycache__
+.pytest_cache
 archive
 *.ipynb
 
-test*
+test.py
 devlog.md
 
 data.csv
