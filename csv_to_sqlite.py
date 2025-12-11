@@ -1,10 +1,7 @@
 import sqlite3
 import pandas as pd
 from utils.movie import add_movie
-from time import perf_counter
-from pathlib import Path
 
-tic = perf_counter()
 def csv_to_sqlite(df: pd.DataFrame, con: sqlite3.Connection) -> None:
     """Export csv data to SQLite database."""
     cur = con.cursor()
@@ -17,29 +14,34 @@ def csv_to_sqlite(df: pd.DataFrame, con: sqlite3.Connection) -> None:
         movie_dict['rating'] = float(movie['rating']) if not pd.isna(movie['rating']) else None
         add_movie(movie_dict, cur)
 
-DB_PATH = Path('data/movies.db')
-CSV_PATH = Path('data/data.csv')
+if __name__ == '__main__':
+    from time import perf_counter
+    from pathlib import Path
 
-if DB_PATH.exists():
-    print(f'Database file {DB_PATH} still exists, deleting...')
-    try:
-        DB_PATH.unlink()
-        print(f'Deleted database file. Re-creating it with data from {CSV_PATH}...')
-    except PermissionError:
-        print('Cannot delete database: it is open in another program. Close it first.')
-        raise SystemExit
+    tic = perf_counter()
+    DB_PATH = Path('data/movies.db')
+    CSV_PATH = Path('data/data.csv')
 
-con = sqlite3.connect(DB_PATH)
-cur = con.cursor()
-with open('sql/schema.sql', 'r') as f:
-    schema_sql = f.read()
+    if DB_PATH.exists():
+        print(f'Database file {DB_PATH} still exists, deleting...')
+        try:
+            DB_PATH.unlink()
+            print(f'Deleted database file. Re-creating it with data from {CSV_PATH}...')
+        except PermissionError:
+            print('Cannot delete database: it is open in another program. Close it first.')
+            raise SystemExit
 
-cur.executescript(schema_sql)
-con.commit()
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+    with open('sql/schema.sql', 'r') as f:
+        schema_sql = f.read()
 
-df = pd.read_csv(CSV_PATH)
-csv_to_sqlite(df, con)
-con.commit()
+    cur.executescript(schema_sql)
+    con.commit()
 
-con.close()
-print(f'Moved data from CSV to SQLite database, took {(perf_counter() - tic):.4f}s.')
+    df = pd.read_csv(CSV_PATH)
+    csv_to_sqlite(df, con)
+    con.commit()
+
+    con.close()
+    print(f'Moved data from CSV to SQLite database, took {(perf_counter() - tic):.4f}s.')
