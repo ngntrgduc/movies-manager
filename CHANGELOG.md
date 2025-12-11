@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  -->
 
+## [[v0.3.1](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.3.1)]
+### Added
+- `fetch_rows_count` in `utils/db.py` to fetch rows count of a table
+- Testing functionalities with pytest
+
+#### CLI
+- Print total rows for `sql` command
+- Show backup last modified for `backup` command
+- `--clean` flag for `fitler` command to hide filtered columns, cleaner output
+- `--note` for `update` command to update only `note`, faster than interactively skip till `note` field
+- Add back `--stats` flag for `filter` command to show statistics for fitlered results
+- Print current database and backup rows for `backup` command
+- Allow using aliased commands (prefix match and fuzzy match), faster experience
+
+### Changed
+- Refactor: centralize filter value handling for `--clean` and `--stats` for `filter` command
+- Move `get_fuzzy_match` to `utils/fuzzy.py`
+
+
 ## [[v0.3.0](https://github.com/ngntrgduc/movie-manager/releases/tag/v0.3.0)]
 
 ### Added
