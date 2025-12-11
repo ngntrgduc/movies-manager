@@ -10,20 +10,23 @@
         Why not TF-IDF? TF-IDF downweights words that appear frequently (like "Action"). In movie recommendations, if you love "Action", you want that word to carry heavy weight.
     - [ ] Using `recommend` for recommendation in CLI? or in web app? or .ipynb?
     - [ ] Using LLM to create Overview of movie by name, year, country?, to create plot soup?
-    - Note field need NLP to extract useful information -> sentiment analysis?
+    - [ ] Sentiment analysis for Note field to extract useful information. Both for Vietnamese and English
+        - [ ] Using LLM for Sentiment analysis? does it sensible? (but reduce privacy)
+    - [ ] How does adding episodes_count and episode_length affect recsys performance?
+    - [ ] TF-IDF -> SBERT (sentence-transformers)?
 - [ ] Calling LLM API for smart summarize like: total watched time,... using name and year field
   - [ ] As a chatbot interface?
-- [ ] Add testing for csv_to_sqlite and CRUD operations on database logic, using pytest, `:memory:` for testing with sqlite
-    - [ ] Running all the tests by using `check` command in CLI
 - [ ] Add another table for watched movies in the past (long time ago) but don't remember the date exactly. Maybe just contains: id, name, year, country.
+- [ ] Add epsisode, length columns (or as a table) for more metadata, more fun to data-analysis
 
 ### CLI
 - [ ] CLI demo as GIF and put it in README
 - [ ] genres subcommand, contain: list (list all genres with id), delete genre, update/edit genres, clean genres (unused genres like 'test', but maybe now this is unecessary because of ON DELETE CASCADE)
-- [ ] Alias commands (prefix match + fuzzy matching), better and faster UX, less to type
-- [ ] Allow to type id for update/delete command if not provided
 - [ ] Allow `resolve_choice` to handle same initials, when the data scaled (more countries, etc.)
 - [ ] Allow adding new country for `add` and `update` command
+    - [ ] showing countries (5+) option when adding/updating is cluttered, bad UX -> hide it instead: show_default = False 
+        - [ ] Or hide it when the total length exceed a specific threshold?
+    - [ ] Add confirmation when adding new country
 
 ### Web App
 - [ ] Add input validation for Add and Edit pages
@@ -66,6 +69,9 @@
 - [x] Searches name + note in one command: `search`
 - [x] Using SQL instead of pandas filtering in `filter` command
 - [x] Move hard-coded type, statuses, and countries to `utils/constants.py`
+- [x] Display number of rows for current database file and backup file for backup command
+- [x] Alias commands (prefix match + fuzzy matching), better and faster UX, less to type
+- [x] Add testing for csv_to_sqlite and CRUD operations on database logic, using pytest, `:memory:` for testing with sqlite
 
 ## Abandoned
 - Color for dataframe using pandas Styler -> Pandas Styler does not compatible with streamlit dataframe, keep it simple
@@ -79,7 +85,7 @@
 - Add toggle in sidebar for: Widgets only show values available in the currently filtered dataset -> Too much to handle, and default filtering feel more natural
 - Better (short) year filtering in CLI -> not long-term compatible, what will happen if the year 2100s come? this is hard to handle
     - ```# mask &= ((df['year'] == year) | (df['year'] % 1000 == year)) # handles short year like 25 for 2025```
-- Using SQL instead of pandas filtering for `--stats` flag in `filter` command  -> Too complex in query handle and building, harder to maintain
+- Using SQL instead of pandas filtering for `--stats` flag in `filter` command  -> Too complex in query handle and building, harder to maintain -> Use bare Python (Counter) to handle it
 - Make `sql` command compatible with filters: `py cli.py sql korea -g romance` -> Too much to handle, but may consider sorting flag instead of filters
 - @st.cache_resource for sqlite database connection -> sqlite is not thread-safe, and streamlit is multi-threaded
 - Use fzf for genres filtering in CL -> more dependency, also CLI is used for quick filtering, for better UX, go to web app
@@ -89,3 +95,6 @@
 - Enable operator filtering, like filter --year >=8 or something like that
 - Paging -> A personal movies collection hardly exceed 10K movies, and Paging method only shine when dealing with database contains million of rows. Also, it's all about UI/UX
 - Implement auto copy old value for current field in `update` command -> this is bad in term of security, also user can select and ctrl + C, a bit of work but improve maintainance, reduce code complexity
+- pomodoro utils to keep track watched time of this week -> too much friction, inaccurate
+- Allow to type id for update/delete command if not provided -> redundant, let click handle it
+- Running all the tests by using `check` command in CLI -> No UX benefit, use uv run pytest instead
