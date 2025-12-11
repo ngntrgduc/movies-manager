@@ -14,3 +14,11 @@ cli = [
     "click>=8.3.0",
     "rich>=14.1.0",
 ]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=9.0.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
