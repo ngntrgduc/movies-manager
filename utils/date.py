@@ -1,7 +1,7 @@
 """Date utilities"""
 
 def get_year(date: str | float) -> int:
-    """Return year of a date as int"""
+    """Return year of a date as integer"""
     # return str(date).split('-')[0]
     return int(str(date)[:4])  # slicing is faster than spliting
 
