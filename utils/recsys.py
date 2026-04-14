@@ -92,7 +92,8 @@ def recommend_recent_profile(
 def recommend_all_profile(
     df: pd.DataFrame, 
     feature_matrix: pd.DataFrame, 
-    top_k: int = 5
+    top_k: int = 5,
+    half_life_days: int = 180,
 ) -> pd.DataFrame:
     """
     Recommend movies using a user profile built from all completed movies.
@@ -139,7 +140,7 @@ def recommend_all_profile(
     today = pd.Timestamp.today().normalize()  # .normalize() removes the time portion
     days_since_watch = (today - watched_date).dt.days
 
-    decay_rate = half_life(180)
+    decay_rate = half_life(half_life_days)
     time_decay_weights = exponential_decay(days_since_watch, decay_rate)
 
     weights = rating_weights * time_decay_weights

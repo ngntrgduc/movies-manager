@@ -545,8 +545,12 @@ def optimize():
 @click.option('-k', '--top-k', default=5, help='Number of recommendations')
 @click.option('-p', '--profile-size', default=5, help='Number of recently watched to build profile from')
 @click.option('-r', '--random', 'show_random', is_flag=True, help='Append random unwatched picks after recommendations')
+@click.option(
+    '-hl', '--half-life', 'half_life_days', type=int, default=180, show_default=True,
+    help='Half-life in days for time decay. Lower = weight recent watches more heavily.'
+)
 @timing
-def recommend(movie_id, top_k, profile_size, show_random):
+def recommend(movie_id, top_k, profile_size, show_random, half_life_days):
     """
     Recommend K movies by movie ID or based on watched movies.
     
@@ -600,8 +604,8 @@ def recommend(movie_id, top_k, profile_size, show_random):
         recommended = recommend_recent_profile(df, feature_matrix, top_k=top_k, profile_size=profile_size)
         display_recommended(recommended)
 
-        print('Recommendations based on all watched movies (rating weights x time decay):')
-        recommended = recommend_all_profile(df, feature_matrix, top_k=top_k)
+        print(f'Recommendations based on all watched movies (rating weights x time decay, {half_life_days=}):')
+        recommended = recommend_all_profile(df, feature_matrix, top_k=top_k, half_life_days=half_life_days)
         display_recommended(recommended)
 
         if show_random:
