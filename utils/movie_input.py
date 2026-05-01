@@ -11,7 +11,7 @@ def prompt_add_movie() -> dict:
 
     name = click.prompt('Name').strip()
     year = click.prompt(
-        'Year', type=IntRangeOrNone(1900, get_current_year()), **skippable_settings
+        'Year', type=IntRangeOrNone(1900, get_current_year() + 2), **skippable_settings
     )
     status = click.prompt('Status', type=AbbrevChoice(MOVIE_STATUSES), default=UNWATCHED_STATUS)
     movie_type = click.prompt('Type', type=AbbrevChoice(MOVIE_TYPES))
