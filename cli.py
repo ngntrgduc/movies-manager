@@ -16,6 +16,7 @@ logger = logging.getLogger('cli')  # prevent showing __main__ in log
 DB_FILE = Path('data/movies.db')
 BACKUP_FILE = Path('data/backup.db')
 CON = get_connection(DB_FILE)
+CON.row_factory = sqlite3.Row  # for dictionary conversion
 
 def update_csv() -> None:
     """Update CSV file with data from database."""
@@ -211,9 +212,7 @@ def get(movie_id, verbose):
     """Get information of a movie by id."""
     from utils.movie import get_movie
 
-    CON.row_factory = sqlite3.Row  # for dictionary conversion
     cur = CON.cursor()
-
     movie = get_movie(movie_id, cur)
     if movie is None:
         print(f'Movie with id {movie_id} not found.')
@@ -245,7 +244,7 @@ def add():
     movie = prompt_add_movie()
     print(movie)
 
-    with Status(f'Adding...') as rich_status:
+    with Status('Adding...') as rich_status:
         from utils.movie import add_movie
         cur = CON.cursor()
         add_movie(movie, cur)
@@ -263,9 +262,7 @@ def update(movie_id, note, latest):
     from utils.movie_input import prompt_update_movie
     from utils.cli import resolve_movie_id
 
-    CON.row_factory = sqlite3.Row
     cur = CON.cursor()
-
     movie_id = resolve_movie_id(movie_id, latest, cur)
     existing_movie = get_movie(movie_id, cur)
     if existing_movie is None:
@@ -306,9 +303,7 @@ def delete(movie_id, latest):
     from utils.movie import get_movie, delete_movie
     from utils.cli import resolve_movie_id
 
-    CON.row_factory = sqlite3.Row  # for dictionary conversion
     cur = CON.cursor()
-
     movie_id = resolve_movie_id(movie_id, latest, cur)
     # Sacrifice formatting for speed by using a tuple instead of a pandas DataFrame
     # Importing pandas is costly compared to sqlite
@@ -337,7 +332,6 @@ def stats(verbose):
     from utils.db import fetch_scalar, fetch_rows, fetch_rows_count
 
     cur = CON.cursor()
-
     total = fetch_rows_count(cur)
     avg_rating = fetch_scalar(cur, 'SELECT ROUND(AVG(rating), 2) FROM movie')
     print(f'Total: {total}')
@@ -581,9 +575,7 @@ def recommend(movie_id, top_k, profile_size, show_random, half_life_days):
     if movie_id is not None:
         from utils.movie import get_movie
 
-        CON.row_factory = sqlite3.Row
         cur = CON.cursor()
-
         movie = get_movie(movie_id, cur)
         if movie is None:
             print(f'Movie with id {movie_id} not found.')
