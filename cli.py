@@ -241,12 +241,12 @@ def add():
     from rich.status import Status
     from utils.movie_input import prompt_add_movie
 
-    movie = prompt_add_movie()
+    cur = CON.cursor()
+    movie = prompt_add_movie(cur)
     print(movie)
 
     with Status('Adding...') as rich_status:
         from utils.movie import add_movie
-        cur = CON.cursor()
         add_movie(movie, cur)
         CON.commit()
         update_csv()

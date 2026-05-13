@@ -4,7 +4,11 @@ from utils.date import get_current_year
 from utils.format import format_genres
 from utils.constants import MOVIE_STATUSES, MOVIE_TYPES, COUNTRIES, UNWATCHED_STATUS
 
-def prompt_add_movie() -> dict:
+def check_duplicate(name, year, cur) -> list:
+    res = cur.execute('SELECT * FROM movie WHERE name = ? AND year = ?', (name, year))
+    return res.fetchall()
+
+def prompt_add_movie(cur) -> dict:
     """Prompt the user interactively to add a new movie and return the data as a dictionary."""
 
     skippable_settings = {'default': '', 'show_default': False}
@@ -13,6 +17,14 @@ def prompt_add_movie() -> dict:
     year = click.prompt(
         'Year', type=IntRangeOrNone(1900, get_current_year() + 2), **skippable_settings
     )
+
+    if (duplicates := check_duplicate(name, year, cur)):
+        print(f'WARNING: {name} ({year}) already exists in library:')
+        for movie in duplicates:
+            print(f" - [{movie['id']}] • {movie['type']} • {movie['country']} • {movie['status']}")
+        if not click.confirm('Add anyway?', default=True):
+            raise click.Abort()
+
     status = click.prompt('Status', type=AbbrevChoice(MOVIE_STATUSES), default=UNWATCHED_STATUS)
     movie_type = click.prompt('Type', type=AbbrevChoice(MOVIE_TYPES))
     country = click.prompt('Country', type=AbbrevChoice(COUNTRIES), **skippable_settings)
